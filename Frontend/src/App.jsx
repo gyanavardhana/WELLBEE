@@ -1,7 +1,24 @@
-export default function App() {
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home/Home";
+import Login from "./pages/Login/Login";
+import Signup from "./pages/Signup/Signup";
+import MoodMeter from "./pages/MoodMeter/MoodMeter";
+import Therapy from "./pages/Therapy/Therapy";
+import Chat from "./pages/Chat/Chat";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import "./index.css";
+const App = () => {
   return (
-    <h1 className="text-3xl text-blue-800 font-bold underline">
-      Hello world!
-    </h1>
-  )
-}
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/moodmeter" element={<MoodMeter />} />
+      <Route path="/therapy" element={<Therapy />} />
+      <Route path="/chat" element={<Chat />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
+  );
+};
+
+export default App;
