@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  height    Float?
+  weight    Float?
+  mood      String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chatMessages          ChatMessage[]
+  moods                 Mood[]
+  coachingTips          CoachingTips[]
+  therapistProfile      TherapistProfile? // Relation with TherapistProfile
+  therapyAppointments   TherapyAppointment[] @relation("userAppointments")
+  therapistAppointments TherapyAppointment[] @relation("therapistAppointments")
+  healthMetrics         HealthMetrics[]
+}
+
+model CoachingTips {
+  id        String   @id @default(cuid())
+  height    Float
+  weight    Float
+  bmi       Float    @default(0)
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  exerciseTips ExerciseTip[]
+  dietTips     DietTip[]
+}
+
+model ExerciseTip {
+  id             String       @id @default(cuid())
+  tip            String
+  coachingTip    CoachingTips @relation(fields: [coachingTipsId], references: [id])
+  coachingTipsId String
+}
+
+model DietTip {
+  id             String       @id @default(cuid())
+  tip            String
+  coachingTip    CoachingTips @relation(fields: [coachingTipsId], references: [id])
+  coachingTipsId String
+}
+
+model ChatMessage {
+  id             String   @id @default(cuid())
+  userId         String
+  message        String
+  sentimentScore Float    @default(0)
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Mood {
+  id                  String   @id @default(cuid())
+  userId              String
+  moodState           String
+  musicRecommendation String?
+  createdAt           DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model TherapyAppointment {
+  id              String   @id @default(cuid())
+  userId          String
+  therapistId     String
+  appointmentDate DateTime
+  status          String   @default("pending")
+  createdAt       DateTime @default(now())
+
+  user      User @relation(name: "userAppointments", fields: [userId], references: [id])
+  therapist User @relation(name: "therapistAppointments", fields: [therapistId], references: [id])
+}
+
+model TherapistProfile {
+  id             String          @id @default(cuid())
+  userId         String          @unique // Foreign key for User
+  specialization String
+  ratings        Float           @default(0)
+  availableSlots AvailableSlot[]
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model AvailableSlot {
+  id                 String           @id @default(cuid())
+  slot               DateTime
+  therapistProfile   TherapistProfile @relation(fields: [therapistProfileId], references: [id])
+  therapistProfileId String
+}
+
+model Music {
+  id     String  @id @default(cuid())
+  mood   String
+  tracks Track[]
+}
+
+model Track {
+  id      String @id @default(cuid())
+  name    String
+  music   Music  @relation(fields: [musicId], references: [id])
+  musicId String
+}
+
+model HealthMetrics {
+  id          String   @id @default(cuid())
+  userId      String
+  dailySteps  Int      @default(0)
+  heartRate   Int?
+  sleepHours  Float?
+  waterIntake Float?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
