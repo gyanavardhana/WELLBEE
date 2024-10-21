@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,48 +12,40 @@ model User {
   name      String
   email     String   @unique
   password  String
+  salt      String   // Salt for password hashing
+  profilePic String? // Nullable field for profile picture URL
   height    Float?
   weight    Float?
-  mood      String?
-  role      String   @default("user")
+  role      Role     @default(USER) // Enum for role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   chatMessages          ChatMessage[]
-  moods                 Mood[]
-  coachingTips          CoachingTips[]
-  therapistProfile      TherapistProfile? // Relation with TherapistProfile
+  therapistProfile      TherapistProfile? // Nullable for users who aren't therapists
   therapyAppointments   TherapyAppointment[] @relation("userAppointments")
   therapistAppointments TherapyAppointment[] @relation("therapistAppointments")
   healthMetrics         HealthMetrics[]
+  exerciseTips          ExerciseTip[] // List of exercise tips
+  dietTips              DietTip[]     // List of diet tips
 }
 
-model CoachingTips {
-  id        String   @id @default(cuid())
-  height    Float
-  weight    Float
-  bmi       Float    @default(0)
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  exerciseTips ExerciseTip[]
-  dietTips     DietTip[]
-}
 
 model ExerciseTip {
-  id             String       @id @default(cuid())
-  tip            String
-  coachingTip    CoachingTips @relation(fields: [coachingTipsId], references: [id])
-  coachingTipsId String
+  id        String   @id @default(cuid())
+  tip       String
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model DietTip {
-  id             String       @id @default(cuid())
-  tip            String
-  coachingTip    CoachingTips @relation(fields: [coachingTipsId], references: [id])
-  coachingTipsId String
+  id        String   @id @default(cuid())
+  tip       String
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model ChatMessage {
@@ -68,16 +54,6 @@ model ChatMessage {
   message        String
   sentimentScore Float    @default(0)
   createdAt      DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-model Mood {
-  id                  String   @id @default(cuid())
-  userId              String
-  moodState           String
-  musicRecommendation String?
-  createdAt           DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -104,24 +80,12 @@ model TherapistProfile {
   user User @relation(fields: [userId], references: [id])
 }
 
+
 model AvailableSlot {
   id                 String           @id @default(cuid())
   slot               DateTime
   therapistProfile   TherapistProfile @relation(fields: [therapistProfileId], references: [id])
   therapistProfileId String
-}
-
-model Music {
-  id     String  @id @default(cuid())
-  mood   String
-  tracks Track[]
-}
-
-model Track {
-  id      String @id @default(cuid())
-  name    String
-  music   Music  @relation(fields: [musicId], references: [id])
-  musicId String
 }
 
 model HealthMetrics {
@@ -134,4 +98,10 @@ model HealthMetrics {
   createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+// Enum to define the roles in the system
+enum Role {
+  USER      // Regular user role
+  THERAPIST // Therapist role
 }
