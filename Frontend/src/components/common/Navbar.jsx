@@ -95,6 +95,7 @@ export default function Navbar() {
           <NavItem onClick={() => handleOptionClick("/moodmeter")} text="Mood Meter" />
           <NavItem onClick={() => handleOptionClick("/therapy")} text="Therapy" />
           <NavItem onClick={() => handleOptionClick("/chat")} text="Chat" />
+          <NavItem onClick={() => handleOptionClick("/dashboard")} text="Dashboard" />
 
           {isLoggedIn ? (
             <ProfileMenu
@@ -122,6 +123,7 @@ export default function Navbar() {
             <NavItem onClick={() => handleOptionClick("/moodmeter")} text="Mood Meter" />
             <NavItem onClick={() => handleOptionClick("/therapy")} text="Therapy" />
             <NavItem onClick={() => handleOptionClick("/chat")} text="Chat" />
+            <NavItem onClick={() => handleOptionClick("/dashboard")} text="Dashboard" />
             {isLoggedIn ? (
               <>
                 <NavItem onClick={() => handleOptionClick("/dashboard")} text="Dashboard" />
