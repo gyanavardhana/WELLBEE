@@ -64,11 +64,13 @@ model TherapyAppointment {
   therapistId     String
   appointmentDate DateTime
   status          String   @default("pending")
+  googleMeet      String?  // Nullable field for Google Meet link
   createdAt       DateTime @default(now())
 
   user      User @relation(name: "userAppointments", fields: [userId], references: [id])
   therapist User @relation(name: "therapistAppointments", fields: [therapistId], references: [id])
 }
+
 
 model TherapistProfile {
   id             String          @id @default(cuid())
