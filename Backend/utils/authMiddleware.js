@@ -7,13 +7,13 @@ const verifyToken = (req, res, next) => {
 
     if (!token) {
         logger.error("No token provided");
-        return res.status(403).json({ error: "No token provided" });
+        return res.status(403).json({ error: "Not authenticated" });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
             logger.error("Failed to authenticate token");
-            return res.status(500).json({ error: "Failed to authenticate token" });
+            return res.status(500).json({ error: "Failed to verify token" });
         }
         // Save user id to request for use in other routes
         req.userId = decoded.userid;
