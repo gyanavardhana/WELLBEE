@@ -21,7 +21,7 @@ const createToken = (userid, secret, expiresIn = "1h") => {
 // Signup function to create a new user
 const signup = async (req, res) => {
     try {
-        const { email, password, name } = req.body;
+        const { email, password, name, role } = req.body;
         const existingUser = await prisma.user.findUnique({
             where: { email }
         });
@@ -148,7 +148,7 @@ const updateUserProfile = async (req, res) => {
         });
 
         logger.info("User profile updated");
-        res.status(200).json({ message: "User profile updated", updatedUser });
+        res.status(200).json({ message: "User profile updated" });
     } catch (err) {
         logger.error(err.message);
         res.status(500).json({ error: "Internal Server Error" });
