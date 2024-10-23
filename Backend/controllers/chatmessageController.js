@@ -6,7 +6,6 @@ const createChatMessage = async (req, res) => {
     try {
         const { message, sentimentScore = 0 } = req.body;
         const userId = req.userId; // Extracted from middleware
-
         const newChatMessage = await prisma.chatMessage.create({
             data: {
                 message,
