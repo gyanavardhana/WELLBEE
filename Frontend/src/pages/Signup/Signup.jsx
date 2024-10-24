@@ -33,6 +33,7 @@ export default function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { username, email, password, confirmPassword } = formData;
+    const name= username;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -47,8 +48,8 @@ export default function SignupPage() {
 
     try {
       await toast.promise(
-        axios.post(`${import.meta.env.VITE_APP_URL}user/signup`, {
-          username,
+        axios.post(`${import.meta.env.VITE_APP_URL}users/signup`, {
+          name,
           email,
           password,
         }),

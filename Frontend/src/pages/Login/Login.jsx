@@ -36,7 +36,7 @@ export default function LoginPage() {
     const { email, password } = formData;
 
     toast.promise(
-      axios.post(`${import.meta.env.VITE_APP_URL}user/login`, { email, password })
+      axios.post(`${import.meta.env.VITE_APP_URL}users/login`, { email, password })
         .then(response => {
           Cookies.set("authToken", response.data.token, { expires: 7 }); // Set the cookie for 7 days
           return response; // Return response to handle success
