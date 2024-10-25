@@ -47,7 +47,7 @@ export default function SignupPage() {
 
     try {
       await toast.promise(
-        axios.post(`${import.meta.env.VITE_APP_URL}user/signup`, {
+        axios.post(`${import.meta.env.VITE_APP_URL}users/signup`, {
           username,
           email,
           password,
