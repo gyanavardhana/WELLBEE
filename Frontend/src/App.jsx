@@ -6,6 +6,8 @@ import MoodMeter from "./pages/MoodMeter/MoodMeter";
 import Therapy from "./pages/Therapy/Therapy";
 import Chat from "./pages/Chat/Chat";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Chatbot from "./chat";
+import VultrChatbot from "./vultrbot";
 import "./index.css";
 const App = () => {
   return (
@@ -17,6 +19,7 @@ const App = () => {
       <Route path="/therapy" element={<Therapy />} />
       <Route path="/chat" element={<Chat />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/x" element={<VultrChatbot />} />
     </Routes>
   );
 };

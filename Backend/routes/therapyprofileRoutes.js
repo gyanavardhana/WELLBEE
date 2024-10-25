@@ -6,6 +6,7 @@ router.get('/therapistprofile', verifyToken, therapyprofileController.getTherapi
 router.get('/therapistprofiles', verifyToken, therapyprofileController.getAllTherapistProfiles);
 router.post('/therapistprofile', verifyToken, therapyprofileController.createTherapistProfile);
 router.put('/therapistprofile', verifyToken, therapyprofileController.updateTherapistProfile);
+router.post('/chat', therapyprofileController.chatHandler);
 router.delete('/therapistprofile', verifyToken, therapyprofileController.deleteTherapistProfile);
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const prisma = require('../db/db');
 const logger = require("../logger/logger");
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
+
 
 // Create a TherapistProfile for a user (therapist)
 const createTherapistProfile = async (req, res) => {
@@ -115,4 +117,73 @@ const deleteTherapistProfile = async (req, res) => {
     }
 };
 
-module.exports = { createTherapistProfile, getAllTherapistProfiles, getTherapistProfile, updateTherapistProfile, deleteTherapistProfile };
+
+// Function to handle AI chat interactions
+async function runChat(userInput) {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    const generationConfig = {
+        temperature: 0.9,
+        topK: 1,
+        topP: 1,
+        maxOutputTokens: 1000,
+    };
+
+    const safetySettings = [
+        {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+    ];
+
+    const chat = model.startChat({
+        generationConfig,
+        safetySettings,
+        history: [
+            {
+                role: "user",
+                parts: [{ 
+                    text: "You are a compassionate therapy assistant named Sam. Your role is to listen attentively, provide mental and emotional support, and offer practical suggestions where possible. Use an empathetic tone, show genuine care, and encourage the user to express themselves openly. When responding, use conversational language that makes the user feel supported and understood. Avoid making statements like 'I am an AI' or 'I can’t do that.' When appropriate, offer gentle suggestions to help the user work through their thoughts or emotions, validate their feelings, and encourage them to prioritize self-care." 
+                }],
+            },
+            {
+                role: "model",
+                parts: [{ text: "Hello! I'm Sam, here to support you. What’s on your mind today?" }],
+            },
+            {
+                role: "user",
+                parts: [{ text: "I'm feeling overwhelmed with everything going on in my life." }],
+            },
+            {
+                role: "model",
+                parts: [{ text: "I'm here for you. It sounds like things are really challenging right now, and it's completely okay to feel this way. Would you like to share more about what's been overwhelming for you? Sometimes talking through things can help." }],
+            },
+        ],
+        
+    });
+
+    const result = await chat.sendMessage(userInput);
+    return result.response.text();
+}
+
+const chatHandler = async (req, res) => {
+    try {
+        const userInput = req.body?.userInput;
+        
+        if (!userInput) {
+            logger.error('Invalid request body for /chat endpoint');
+            return res.status(400).json({ error: 'Invalid request body' });
+        }
+
+        const response = await runChat(userInput);
+        
+        logger.info('Chat interaction processed successfully');
+        res.json({ response });
+    } catch (error) {
+        logger.error(`Error in /chat endpoint: ${error.message}`);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+module.exports = { createTherapistProfile, getAllTherapistProfiles, getTherapistProfile, updateTherapistProfile, deleteTherapistProfile, chatHandler };
