@@ -13,7 +13,7 @@ const Chat = () => {
 
   // Connect to WebSocket server
   useEffect(() => {
-    socket.current = io("http://localhost:3000"); // Replace with your server URL if different
+    socket.current = io("http://localhost:3001"); // Replace with your server URL if different
 
     // Get the unique socket ID for the connected user
     socket.current.on("connect", () => {
