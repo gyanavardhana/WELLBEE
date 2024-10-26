@@ -1,15 +1,18 @@
 const prisma = require('../db/db');
 const logger = require("../logger/logger");
-
+const axios  = require('axios');
 // Function to create a new chat message
 const createChatMessage = async (req, res) => {
     try {
-        const { message, sentimentScore = 0 } = req.body;
+        const { message } = req.body;
         const userId = req.userId; // Extracted from middleware
+        const response = await axios.post(process.env.FASTAPI_URL, {
+            text: message,
+         });
         const newChatMessage = await prisma.chatMessage.create({
             data: {
-                message,
-                sentimentScore,
+                message: response.data.message,
+                sentimentScore: response.data.sentiment_score,
                 userId,
             },
         });

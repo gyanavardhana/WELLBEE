@@ -13,6 +13,7 @@ const excersiceRoutes = require('./routes/excersicetipRoutes');
 const therapyprofileRoutes = require('./routes/therapyprofileRoutes');
 const avaiableslotRoutes = require('./routes/availableslotRoutes');
 const therapyappointmentRoutes = require('./routes/therapyappointmentRoutes');
+const spotifyRoutes = require('./routes/spotifyRoutes');
 
 app.get('/', (req, res) => {
     res.send('Hello World');
@@ -65,6 +66,7 @@ app.use('/excersice', excersiceRoutes);
 app.use('/therapy', therapyprofileRoutes);
 app.use('/slot', avaiableslotRoutes);
 app.use('/appointment', therapyappointmentRoutes);
+app.use('/spotify', spotifyRoutes);
 
 app.listen(3000, () => {
     console.log(`Server is running on port 3000`);
