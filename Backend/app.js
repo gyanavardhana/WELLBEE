@@ -8,12 +8,13 @@ app.use(express.json());
 // Routes
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatmessageRoutes');
-const healthRoutes = require('./routes/healthmetricsRoutes');
+const healthmetricRoutes = require('./routes/healthmetricsRoutes');
 const dietRoutes = require('./routes/diettipRoutes');
 const exerciseRoutes = require('./routes/excersiceTipRoutes');
 const therapyProfileRoutes = require('./routes/therapyprofileRoutes');
 const availableSlotRoutes = require('./routes/availableslotRoutes');
 const therapyAppointmentRoutes = require('./routes/therapyappointmentRoutes');
+const healthRoutes= require('./routes/healthRoutes')
 
 // Add CORS to allow all origins
 app.use(cors({ origin: '*', optionsSuccessStatus: 200 }));
@@ -26,12 +27,12 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/users', userRoutes);
 app.use('/chat', chatRoutes);
-app.use('/health', healthRoutes);
 app.use('/diet', dietRoutes);
 app.use('/exercise', exerciseRoutes);
 app.use('/therapy', therapyProfileRoutes);
 app.use('/slot', availableSlotRoutes);
 app.use('/appointment', therapyAppointmentRoutes);
+app.use('/health',healthRoutes)
 
 // Start Express server on port 3000
 app.listen(3000, () => {
