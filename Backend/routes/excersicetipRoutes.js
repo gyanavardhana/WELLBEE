@@ -6,5 +6,6 @@ router.post('/createexcersicetip', verifyToken, excersicetipController.createExe
 router.get('/getexcersicetips', verifyToken, excersicetipController.getExerciseTips);
 router.put('/updateexcersicetip/:tipId', verifyToken, excersicetipController.updateExerciseTip);
 router.delete('/deleteexcersicetip/:tipId',verifyToken, excersicetipController.deleteExerciseTip);
+router.get('/getexcersices', verifyToken, excersicetipController.getExerciseRecommendations);
 
 module.exports = router;
