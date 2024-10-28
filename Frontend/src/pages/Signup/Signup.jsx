@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-// Import assets
+import { toast, Zoom } from "react-toastify";
 import WellbeeLogo from "../../assets/images/colorlogo.svg"; // Replace with Wellbee logo
-import signupImage from "../../assets/images/wellbee-signup1.svg"; // lace with Wellbee illustration
+import signupImage from "../../assets/images/wellbee-signup1.svg"; // Replace with Wellbee illustration
 import Navbar from "../../components/common/Navbar";
 
 export default function SignupPage() {
@@ -47,8 +44,8 @@ export default function SignupPage() {
 
     try {
       await toast.promise(
-        axios.post(`${import.meta.env.VITE_APP_URL}user/signup`, {
-          username,
+        axios.post(`${import.meta.env.VITE_APP_URL}users/signup`, {
+          name: username,
           email,
           password,
         }),
@@ -184,7 +181,6 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </>
   );
 }

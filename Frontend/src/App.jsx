@@ -11,6 +11,8 @@ import VultrChatbot from "./vultrbot";
 import "./index.css";
 const App = () => {
   return (
+    <>
+    
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
@@ -21,6 +23,7 @@ const App = () => {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/x" element={<VultrChatbot />} />
     </Routes>
+    </>
   );
 };
 

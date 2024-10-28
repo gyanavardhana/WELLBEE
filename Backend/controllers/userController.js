@@ -78,7 +78,7 @@ const login = async (req, res) => {
             res.status(401).json({ error: "Wrong password" });
         }
     } catch (err) {
-        logger.error("Invalid login attempt");
+        logger.error(err.message);
         res.status(401).json({ error: "Invalid login attempt" });
     }
 };

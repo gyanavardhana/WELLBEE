@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { ToastContainer, toast, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Menu, X } from 'lucide-react';
 import Logo1 from "../../assets/images/colorlogo.svg";
 import Logo2 from "../../assets/images/colortext.svg";
+import { isTokenExpired } from "../../utils/authUtils";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Navbar() {
   const [openMenu, setOpenMenu] = useState({ login: false, profile: false });
@@ -53,7 +54,9 @@ export default function Navbar() {
       autoClose: 1000,
       transition: Zoom,
     });
-    navigate("/");
+    setTimeout(() => {
+      navigate("/");
+    }, 1000);
     setIsMobileMenuOpen(false);
   };
 
@@ -64,7 +67,6 @@ export default function Navbar() {
   return (
     <>
       <nav className="bg-orange-100 p-4 flex justify-between items-center shadow-md w-full fixed top-0 border-b border-orange-300 z-50">
-        {/* Left side: Logos */}
         <div className="flex items-center space-x-4 h-16">
           <img
             src={Logo1}
@@ -80,7 +82,6 @@ export default function Navbar() {
           />
         </div>
 
-        {/* Mobile menu toggle */}
         <div className="md:hidden">
           <button
             onClick={toggleMobileMenu}
@@ -90,7 +91,6 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Desktop menu */}
         <div className="hidden md:flex items-center space-x-8">
           <NavItem onClick={() => handleOptionClick("/moodmeter")} text="Mood Meter" />
           <NavItem onClick={() => handleOptionClick("/therapy")} text="Therapy" />
@@ -116,7 +116,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-orange-100 pt-20">
           <div className="flex flex-col items-center space-y-4 p-4">
@@ -138,10 +137,17 @@ export default function Navbar() {
           </div>
         </div>
       )}
-
-      <ToastContainer
+    <ToastContainer
         position="bottom-right"
         autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
         transition={Zoom}
       />
     </>
@@ -213,8 +219,3 @@ const LoginMenu = ({ handleMouseEnter, handleMouseLeave, isOpen, navigate }) => 
   </div>
 );
 
-// Utility function to check token expiration (mock implementation)
-function isTokenExpired(token) {
-  // Mock implementation: In real use case, verify token expiration using libraries like jwt-decode
-  return false;
-}

@@ -5,7 +5,7 @@ import WellbeeLogo from "../../assets/images/colorlogo.svg"; // Replace with Wel
 import loginImage from "../../assets/images/wellbee-login.svg"; // Replace with Wellbee illustration
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/common/Navbar";
-import { ToastContainer, toast, Zoom } from "react-toastify";
+import { toast, Zoom } from "react-toastify"; // ToastContainer is already in App
 import "react-toastify/dist/ReactToastify.css";
 
 export default function LoginPage() {
@@ -36,7 +36,7 @@ export default function LoginPage() {
     const { email, password } = formData;
 
     toast.promise(
-      axios.post(`${import.meta.env.VITE_APP_URL}user/login`, { email, password })
+      axios.post(`${import.meta.env.VITE_APP_URL}users/login`, { email, password })
         .then(response => {
           Cookies.set("authToken", response.data.token, { expires: 7 }); // Set the cookie for 7 days
           return response; // Return response to handle success
@@ -134,7 +134,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </>
   );
 }
