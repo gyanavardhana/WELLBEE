@@ -49,17 +49,21 @@ const recommendSong = async (req, res) => {
       take: 10,
     });
 
-    // Calculate the frequency of each sentiment
-    const sentimentFrequency = {};
-    messages.forEach((msg) => {
-      const sentiment = getSentimentCategory(msg.sentimentScore) || 'neutral';
-      sentimentFrequency[sentiment] = (sentimentFrequency[sentiment] || 0) + 1;
-    });
+    let dominantSentiment = 'neutral'; // Default to 'neutral'
 
-    // Find the dominant sentiment
-    const dominantSentiment = Object.keys(sentimentFrequency).reduce((a, b) =>
-      sentimentFrequency[a] > sentimentFrequency[b] ? a : b
-    );
+    if (messages.length > 0) {
+      // Calculate the frequency of each sentiment
+      const sentimentFrequency = {};
+      messages.forEach((msg) => {
+        const sentiment = getSentimentCategory(msg.sentimentScore) || 'neutral';
+        sentimentFrequency[sentiment] = (sentimentFrequency[sentiment] || 0) + 1;
+      });
+
+      // Find the dominant sentiment
+      dominantSentiment = Object.keys(sentimentFrequency).reduce((a, b) =>
+        sentimentFrequency[a] > sentimentFrequency[b] ? a : b
+      );
+    }
 
     // Search Spotify for a playlist matching the dominant sentiment
     const playlistData = await spotifyApi.searchPlaylists(`${dominantSentiment} playlist`, { limit: 1 });
@@ -81,13 +85,17 @@ const recommendSong = async (req, res) => {
 
     const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
     const songUrl = randomTrack.track.external_urls.spotify;
+    const songName = randomTrack.track.name;
+    const artistName = randomTrack.track.artists[0].name;
+    const previewUrl = randomTrack.track.preview_url;
 
     logger.info('Song recommendation retrieved successfully');
-    res.status(200).json({ songUrl, dominantSentiment });
+    res.status(200).json({ songName, artistName, previewUrl, songUrl, dominantSentiment });
   } catch (error) {
-    logger.error('Error fetching song recommendation:', error.message);
+    logger.error('Error fetching song recommendation:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
 module.exports = { recommendSong };
+
