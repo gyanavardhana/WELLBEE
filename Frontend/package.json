@@ -11,7 +11,9 @@
     "css": "npx tailwindcss -i ./src/index.css -o ./public/App.css --watch"
   },
   "dependencies": {
+    "@souhaildev/reactemojis": "^1.0.5",
     "axios": "^1.7.7",
+    "framer-motion": "^11.11.10",
     "frontend": "file:",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.453.0",
