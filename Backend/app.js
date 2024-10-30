@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const session = require('express-session');
 
 const app = express();
 app.use(express.json());
@@ -26,11 +27,20 @@ const therapyAppointmentRoutes = require('./routes/therapyappointmentRoutes');
 const spotifyRoutes = require('./routes/spotifyRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const vultrRoutes = require('./routes/vultrRoutes');
+const fitbitRoutes= require('./routes/fitbitRoutes')
+
 
 // Base route
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
+app.use(session({
+    secret: 'your_secret_key', // Change this to a strong secret
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
+  }));
+  
 
 
 
@@ -46,6 +56,7 @@ app.use('/appointment', therapyAppointmentRoutes);
 app.use('/spotify', spotifyRoutes);
 app.use('/health', healthRoutes);
 app.use('/vultr', vultrRoutes);
+app.use('/fitbit',fitbitRoutes)
 
 // Start Express server on port 3000
 app.listen(3000, () => {
