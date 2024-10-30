@@ -29,6 +29,8 @@ const Slots = () => {
   const userRole = Cookies.get("role");
 
   useEffect(() => {
+    let isMounted = true; // Track if the component is mounted
+
     const fetchSlots = async () => {
       try {
         const response = await getAllSlots();
@@ -42,16 +44,26 @@ const Slots = () => {
           );
         }
 
-        setSlots(filteredSlots);
+        if (isMounted) { // Check if still mounted
+          setSlots(filteredSlots);
+        }
       } catch (err) {
-        setError(err.message);
+        if (isMounted) { // Check if still mounted
+          setError(err.message);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) { // Check if still mounted
+          setLoading(false);
+        }
       }
     };
 
     fetchSlots();
-  }, [userRole]);
+
+    return () => {
+      isMounted = false; // Cleanup function to set isMounted to false
+    };
+  }, []); // Empty dependency array to run only once on mount
 
   const handleRatingChange = (therapistId, rating) => {
     setSelectedRating((prev) => ({ ...prev, [therapistId]: rating }));

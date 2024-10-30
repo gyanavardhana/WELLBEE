@@ -45,11 +45,11 @@ export const getTherapyAppointmentsForTherapist = async () => {
 };
 
 // Update the status of a therapy appointment
-export const updateTherapyAppointmentStatus = async (appointmentId, status) => {
+export const updateTherapyAppointmentStatus = async (appointmentId, status, googleMeet) => {
     const token = getAuthToken();
     const response = await axios.put(
         `${API_URL}appointment/updateappointment/${appointmentId}`, // Change the URL according to your API
-        { status },
+        { status, googleMeet },
         {
             headers: {
                 Authorization: `Bearer ${token}`,

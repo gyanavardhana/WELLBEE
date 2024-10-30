@@ -80,7 +80,7 @@ const getTherapyAppointmentsForTherapist = async (req, res) => {
 const updateTherapyAppointmentStatus = async (req, res) => {
     try {
         const { appointmentId } = req.params;
-        const { status } = req.body;
+        const { status, googleMeet } = req.body;
 
         // Check if the appointment exists
         const therapyAppointment = await prisma.therapyAppointment.findUnique({
@@ -101,7 +101,7 @@ const updateTherapyAppointmentStatus = async (req, res) => {
         // Update the status
         const updatedAppointment = await prisma.therapyAppointment.update({
             where: { id: appointmentId },
-            data: { status },
+            data: { status, googleMeet },
         });
 
         logger.info("Therapy appointment status updated successfully");

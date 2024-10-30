@@ -73,45 +73,48 @@ export default function LoginPage() {
     const { email, password } = formData;
 
     if (!email || !password) {
-      setError("Email and password are required.");
-      return;
+        toast.error("Email and password are required.");
+        return;
     }
 
     setIsLoading(true);
 
     try {
-      await toast.promise(login({ email, password }), {
-        pending: {
-          render: "Logging in...",
-          icon: "🔄",
-        },
-        success: {
-          render: () => {
-            navigateToHome();
-            return "Login Successful! 🎉";
-          },
-        },
-        error: {
-          render: ({ data }) => {
-            setError(data || "Internal Server Error");
-            return `Error: ${data || "Internal Server Error"} 😕`;
-          },
-        },
-        position: "bottom-right",
-        autoClose: 1500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light",
-        transition: Zoom,
-      });
+        await toast.promise(login({ email, password }), {
+            pending: {
+                render: "Logging in...",
+                icon: "🔄",
+            },
+            success: {
+                render: () => {
+                    navigateToHome();
+                    return "Login Successful! 🎉";
+                },
+            },
+            error: {
+                render: ({ data }) => {
+                    // Use toast to display the error message
+                    toast.error(data || "Internal Server Error");
+                    return `Error: ${data.message || "Internal Server Error"} 😕`;
+                },
+            },
+            position: "bottom-right",
+            autoClose: 1500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Zoom,
+        });
     } catch (err) {
-      console.error("Login error:", err);
+        console.error("Login error:", err);
+        toast.error("An unexpected error occurred.");
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
+
 
   return (
     <>
