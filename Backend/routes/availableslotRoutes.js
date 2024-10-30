@@ -4,6 +4,7 @@ const verifyToken = require('../utils/authMiddleware');
 
 
 router.post('/createslot', verifyToken, availableslotController.createAvailableSlot);
+router.get('/getallslots', verifyToken, availableslotController.getAllSlots);
 router.get('/getslots', verifyToken, availableslotController.getAvailableSlots);
 router.put('/updateslot/:slotId', verifyToken, availableslotController.updateAvailableSlot);
 router.delete('/deleteslot/:slotId', verifyToken, availableslotController.deleteAvailableSlot);

@@ -83,6 +83,26 @@ export const updateTherapistProfile = async (specialization, ratings) => {
   }
 };
 
+export const updateTherapistProfilebyUser = async (id, specialization, ratings) => {
+  const token = getAuthToken();
+  try {
+    const response = await axios.put(
+      `${API_URL}therapy/therapistprofile/rating`,
+      { id, specialization, ratings },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || { message: "Error updating therapist profile" }
+    );
+  }
+};
+
 // Delete therapist profile for a user
 export const deleteTherapistProfile = async () => {
   const token = getAuthToken();

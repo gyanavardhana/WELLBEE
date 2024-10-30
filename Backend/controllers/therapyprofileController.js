@@ -78,11 +78,37 @@ const getTherapistProfile = async (req, res) => {
 const updateTherapistProfile = async (req, res) => {
     try {
         const userId = req.userId;
+        
         const { specialization, ratings } = req.body;
+        
 
         const updatedProfile = await prisma.therapistProfile.update({
             where: {
                 userId,
+            },
+            data: {
+                specialization,
+                ratings: ratings ? parseFloat(ratings) : undefined, // Optional ratings update
+            },
+        });
+
+        logger.info("Therapist profile updated");
+        res.status(200).json({ message: "Therapist profile updated", updatedProfile });
+    } catch (err) {
+        logger.error(err.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+const updateTherapistProfilebyUser = async (req, res) => {
+    try {
+        
+        const { specialization, ratings, id } = req.body;
+        
+
+        const updatedProfile = await prisma.therapistProfile.update({
+            where: {
+                id,
             },
             data: {
                 specialization,
@@ -144,12 +170,12 @@ async function runChat(userInput) {
             {
                 role: "user",
                 parts: [{ 
-                    text: "You are a compassionate therapy assistant named Sam. Your role is to listen attentively, provide mental and emotional support, and offer practical suggestions where possible. Use an empathetic tone, show genuine care, and encourage the user to express themselves openly. When responding, use conversational language that makes the user feel supported and understood. Avoid making statements like 'I am an AI' or 'I can’t do that.' When appropriate, offer gentle suggestions to help the user work through their thoughts or emotions, validate their feelings, and encourage them to prioritize self-care." 
+                    text: "You are a compassionate therapy assistant named Feelix. Your role is to listen attentively, provide mental and emotional support, and offer practical suggestions where possible. Use an empathetic tone, show genuine care, and encourage the user to express themselves openly. When responding, use conversational language that makes the user feel supported and understood. Avoid making statements like 'I am an AI' or 'I can’t do that.' When appropriate, offer gentle suggestions to help the user work through their thoughts or emotions, validate their feelings, and encourage them to prioritize self-care." 
                 }],
             },
             {
                 role: "model",
-                parts: [{ text: "Hello! I'm Sam, here to support you. What’s on your mind today?" }],
+                parts: [{ text: "Hello! I'm Feelix, here to support you. What’s on your mind today?" }],
             },
             {
                 role: "user",
@@ -186,4 +212,4 @@ const chatHandler = async (req, res) => {
     }
 };
 
-module.exports = { createTherapistProfile, getAllTherapistProfiles, getTherapistProfile, updateTherapistProfile, deleteTherapistProfile, chatHandler };
+module.exports = { createTherapistProfile, getAllTherapistProfiles, getTherapistProfile, updateTherapistProfile, deleteTherapistProfile, chatHandler, updateTherapistProfilebyUser };

@@ -10,9 +10,6 @@ import Chatbot from "./chat";
 import VultrChatbot from "./vultrbot";
 import Profile from "./pages/Profile/Profile";
 import "./index.css";
-import TherapistProfile from "./components/profile/therapistProfile";
-import UserProfile from "./components/profile/userProfile";
-import HealthMetrics from "./components/profile/healthmetrics";
 const App = () => {
   return (
     <>
@@ -26,7 +23,7 @@ const App = () => {
       <Route path="/chat" element={<Chat />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/x" element={<HealthMetrics />} />
+      <Route path="/x" element={<Chatbot />} />
     </Routes>
     </>
   );

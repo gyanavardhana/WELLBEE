@@ -7,7 +7,7 @@ const createTherapyAppointment = async (req, res) => {
 
         // Check if the therapist exists
         const therapist = await prisma.therapistProfile.findUnique({
-            where: { userId: therapistId },
+            where: { id: therapistId },
         });
         if (!therapist) {
             logger.error("Therapist not found during appointment creation");
@@ -18,7 +18,7 @@ const createTherapyAppointment = async (req, res) => {
         const therapyAppointment = await prisma.therapyAppointment.create({
             data: {
                 userId: req.userId,
-                therapistId,
+                therapistId: therapist.userId,
                 appointmentDate: new Date(appointmentDate),
                 googleMeet,
                 status: "pending", // Default status is 'pending'

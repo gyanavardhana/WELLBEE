@@ -18,12 +18,12 @@ const createAvailableSlot = async (req, res) => {
         // Extract the therapistProfileId from the fetched therapist profile
         const therapistProfileId = therapistProfile.id;
         const { slot } = req.body;
-
+        console.log(req.body);
         // Create the available slot using the therapistProfileId
         const availableSlot = await prisma.availableSlot.create({
             data: {
                 therapistProfileId,
-                slot: new Date(slot), // Ensure slot is a valid Date
+                slot:  new Date(slot), // Ensure slot is a valid Date
             },
         });
 
@@ -112,4 +112,70 @@ const deleteAvailableSlot = async (req, res) => {
     }
 };
 
-module.exports = { createAvailableSlot, getAvailableSlots, updateAvailableSlot, deleteAvailableSlot };
+// Get all available slots grouped by therapist profile
+const getAllSlots = async (req, res) => {
+    try {
+        // Fetch all therapist profiles along with associated user information
+        const therapists = await prisma.therapistProfile.findMany({
+            include: {
+                user: { // Include user information
+                    select: {
+                        name: true, // Select the name field
+                    },
+                },
+            },
+        });
+
+        if (!therapists || therapists.length === 0) {
+            logger.error("No therapists found");
+            return res.status(404).json({ error: "No therapists found" });
+        }
+
+        // Prepare an array to hold the grouped slots
+        const groupedSlots = [];
+
+        // Loop through each therapist profile
+        for (const therapist of therapists) {
+            // Fetch available slots for the current therapist
+            const availableSlots = await prisma.availableSlot.findMany({
+                where: { therapistProfileId: therapist.id },
+                orderBy: { slot: 'asc' }
+            });
+
+            // Push to the groupedSlots array if there are available slots
+            if (availableSlots && availableSlots.length > 0) {
+                groupedSlots.push({
+                    therapistProfile: {
+                        ...therapist,
+                        userName: therapist.user.name, // Add the user's name
+                    },
+                    slots: availableSlots,
+                });
+            }
+        }
+
+        // Check if there are any grouped slots
+        if (groupedSlots.length === 0) {
+            logger.error("No available slots found for any therapists");
+            return res.status(404).json({ error: "No available slots found for any therapists" });
+        }
+
+        logger.info("Available slots grouped by therapist retrieved");
+        res.status(200).json({ groupedSlots });
+    } catch (err) {
+        logger.error(err.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
+module.exports = {
+    createAvailableSlot,
+    getAvailableSlots,
+    updateAvailableSlot,
+    deleteAvailableSlot,
+    getAllSlots, // Export the new function
+};
+
+
+
