@@ -48,6 +48,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     Cookies.remove("authToken");
+    Cookies.remove("role");
     setIsLoggedIn(false);
     toast.success("Logged out successfully", {
       position: "bottom-right",
@@ -102,7 +103,7 @@ export default function Navbar() {
               handleMouseEnter={() => handleMouseEnter("profile")}
               handleMouseLeave={() => handleMouseLeave("profile")}
               isOpen={openMenu.profile}
-              handleDashboardClick={() => handleOptionClick("/dashboard")}
+              handleProfileClick={() => handleOptionClick("/profile")}
               handleLogout={handleLogout}
             />
           ) : (
@@ -125,7 +126,7 @@ export default function Navbar() {
             <NavItem onClick={() => handleOptionClick("/dashboard")} text="Dashboard" />
             {isLoggedIn ? (
               <>
-                <NavItem onClick={() => handleOptionClick("/dashboard")} text="Dashboard" />
+                <NavItem onClick={() => handleOptionClick("/profile")} text="Profile" />
                 <NavItem onClick={handleLogout} text="Logout" />
               </>
             ) : (
@@ -137,7 +138,7 @@ export default function Navbar() {
           </div>
         </div>
       )}
-    <ToastContainer
+      <ToastContainer
         position="bottom-right"
         autoClose={1000}
         hideProgressBar={false}
@@ -163,7 +164,7 @@ const NavItem = ({ onClick, text }) => (
   </button>
 );
 
-const ProfileMenu = ({ handleMouseEnter, handleMouseLeave, isOpen, handleDashboardClick, handleLogout }) => (
+const ProfileMenu = ({ handleMouseEnter, handleMouseLeave, isOpen, handleProfileClick, handleLogout }) => (
   <div
     className="relative"
     onMouseEnter={handleMouseEnter}
@@ -175,10 +176,10 @@ const ProfileMenu = ({ handleMouseEnter, handleMouseLeave, isOpen, handleDashboa
     {isOpen && (
       <div className="absolute right-0 mt-2 w-48 bg-orange-100 border rounded shadow-lg border-orange-300">
         <div
-          onClick={handleDashboardClick}
+          onClick={handleProfileClick}
           className="px-4 py-2 text-orange-800 hover:bg-orange-200 cursor-pointer transition duration-300"
         >
-          Dashboard
+          Profile
         </div>
         <div
           onClick={handleLogout}
@@ -218,4 +219,3 @@ const LoginMenu = ({ handleMouseEnter, handleMouseLeave, isOpen, navigate }) => 
     )}
   </div>
 );
-

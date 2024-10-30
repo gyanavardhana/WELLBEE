@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast, Zoom } from "react-toastify";
-import WellbeeLogo from "../../assets/images/colorlogo.svg"; // Replace with Wellbee logo
-import signupImage from "../../assets/images/wellbee-signup1.svg"; // Replace with Wellbee illustration
+import { motion } from "framer-motion";
+import WellbeeLogo from "../../assets/images/colorlogo.svg";
+import signupImage from "../../assets/images/wellbee-signup1.svg";
 import Navbar from "../../components/common/Navbar";
+import { signup } from "../../services/userServices";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ export default function SignupPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "USER", // Default role
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { username, email, password, confirmPassword } = formData;
+    const { username, email, password, confirmPassword, role } = formData;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -44,11 +46,7 @@ export default function SignupPage() {
 
     try {
       await toast.promise(
-        axios.post(`${import.meta.env.VITE_APP_URL}users/signup`, {
-          name: username,
-          email,
-          password,
-        }),
+        signup({ name: username, email, password, role }), // Include role
         {
           pending: "Creating your account...",
           success: "User Created Successfully",
@@ -76,30 +74,78 @@ export default function SignupPage() {
     }
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        when: "beforeChildren",
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.4 },
+    },
+  };
+
+  const imageVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.6 },
+    },
+  };
+
   return (
     <>
       <Navbar />
       <div className="min-h-screen flex items-center mt-10 justify-center bg-orange-100">
-        <div className="bg-white mt-20 shadow-lg rounded-lg overflow-hidden flex w-3/4 max-w-4xl">
+        <motion.div
+          className="bg-white mt-20 shadow-lg rounded-lg overflow-hidden flex w-3/4 max-w-4xl"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
           {/* Signup Image Section */}
-          <div className="hidden md:block md:w-1/2 bg-orange-200 p-8">
+          <motion.div
+            className="hidden md:block md:w-1/2 bg-orange-200 p-8"
+            variants={imageVariants}
+          >
             <img
               src={signupImage}
               alt="Signup Illustration"
               className="w-full h-full object-cover"
             />
-          </div>
+          </motion.div>
 
           {/* Form Section */}
           <div className="w-full md:w-1/2 p-8">
-            <div className="flex justify-center mb-4">
+            <motion.div
+              className="flex justify-center mb-4"
+              variants={itemVariants}
+            >
               <img src={WellbeeLogo} alt="Wellbee Logo" className="h-14 w-55" />
-            </div>
-            <h2 className="text-2xl font-bold mb-6 text-center text-orange-500">
+            </motion.div>
+
+            <motion.h2
+              className="text-2xl font-bold mb-6 text-center text-orange-500"
+              variants={itemVariants}
+            >
               Sign Up to Wellbee
-            </h2>
+            </motion.h2>
+
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
+              <motion.div className="mb-4" variants={itemVariants}>
                 <label
                   className="block text-orange-500 text-sm font-bold mb-2"
                   htmlFor="username"
@@ -114,9 +160,9 @@ export default function SignupPage() {
                   value={formData.username}
                   onChange={handleChange}
                 />
-              </div>
+              </motion.div>
 
-              <div className="mb-4">
+              <motion.div className="mb-4" variants={itemVariants}>
                 <label
                   className="block text-orange-500 text-sm font-bold mb-2"
                   htmlFor="email"
@@ -131,9 +177,9 @@ export default function SignupPage() {
                   value={formData.email}
                   onChange={handleChange}
                 />
-              </div>
+              </motion.div>
 
-              <div className="mb-4">
+              <motion.div className="mb-4" variants={itemVariants}>
                 <label
                   className="block text-orange-500 text-sm font-bold mb-2"
                   htmlFor="password"
@@ -148,9 +194,9 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={handleChange}
                 />
-              </div>
+              </motion.div>
 
-              <div className="mb-6">
+              <motion.div className="mb-6" variants={itemVariants}>
                 <label
                   className="block text-orange-500 text-sm font-bold mb-2"
                   htmlFor="confirmPassword"
@@ -165,21 +211,55 @@ export default function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                 />
-              </div>
+              </motion.div>
 
-              {error && <p className="text-red-500 text-xs italic">{error}</p>}
+              {/* Role Selection Dropdown */}
+              <motion.div className="mb-4" variants={itemVariants}>
+                <label
+                  className="block text-orange-500 text-sm font-bold mb-2"
+                  htmlFor="role"
+                >
+                  Role
+                </label>
+                <select
+                  id="role"
+                  name="role"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={formData.role}
+                  onChange={handleChange}
+                >
+                  <option value="USER">User</option>
+                  <option value="THERAPIST">Therapist</option>
+                </select>
+              </motion.div>
 
-              <div className="flex items-center justify-between">
-                <button
+              {error && (
+                <motion.p
+                  className="text-red-500 text-xs italic"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {error}
+                </motion.p>
+              )}
+
+              <motion.div
+                className="flex items-center justify-between"
+                variants={itemVariants}
+              >
+                <motion.button
                   type="submit"
                   className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Sign Up
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             </form>
           </div>
-        </div>
+        </motion.div>
       </div>
     </>
   );

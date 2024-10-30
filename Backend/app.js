@@ -68,6 +68,7 @@ app.use('/slot', avaiableslotRoutes);
 app.use('/appointment', therapyappointmentRoutes);
 app.use('/spotify', spotifyRoutes);
 
+
 app.listen(3000, () => {
     console.log(`Server is running on port 3000`);
 });

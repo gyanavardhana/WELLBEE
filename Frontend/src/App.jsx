@@ -8,7 +8,11 @@ import Chat from "./pages/Chat/Chat";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Chatbot from "./chat";
 import VultrChatbot from "./vultrbot";
+import Profile from "./pages/Profile/Profile";
 import "./index.css";
+import TherapistProfile from "./components/profile/therapistProfile";
+import UserProfile from "./components/profile/userProfile";
+import HealthMetrics from "./components/profile/healthmetrics";
 const App = () => {
   return (
     <>
@@ -21,7 +25,8 @@ const App = () => {
       <Route path="/therapy" element={<Therapy />} />
       <Route path="/chat" element={<Chat />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/x" element={<VultrChatbot />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/x" element={<HealthMetrics />} />
     </Routes>
     </>
   );

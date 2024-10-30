@@ -71,8 +71,9 @@ const login = async (req, res) => {
         const hashedPassword = await hashPassword(password, user.salt);
         if (user.password === hashedPassword) {
             const token = createToken(user.id, process.env.JWT_SECRET);
+            const role = user.role;
             logger.info("Login successful");
-            res.status(200).json({ message: "Login successful", token });
+            res.status(200).json({ message: "Login successful", token, role });
         } else {
             logger.error("Wrong password");
             res.status(401).json({ error: "Wrong password" });
