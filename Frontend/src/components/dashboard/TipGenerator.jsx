@@ -6,8 +6,8 @@ import {
   deleteExerciseTip,
   getExerciseRecommendations,
 } from "../../services/tipServices";
-
 import { getHealthInfo } from "../../services/nutritionServices";
+import { FaPlus, FaEdit, FaTrash, FaRunning, FaAppleAlt } from "react-icons/fa";
 
 const TipGenerator = () => {
   const [tips, setTips] = useState([]);
@@ -63,8 +63,8 @@ const TipGenerator = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto mt-10">
-      <h2 className="text-2xl font-semibold text-orange-600 mb-4">Exercise Tips</h2>
+    <div className="bg-gray-100 rounded-lg shadow-lg p-6 max-w-2xl mx-auto mt-10">
+      <h2 className="text-3xl font-bold text-orange-600 mb-4 text-center">Exercise Tips & Health Info</h2>
 
       {/* Add New Tip Form */}
       <div className="mb-6">
@@ -73,13 +73,13 @@ const TipGenerator = () => {
           placeholder="Enter a new exercise tip"
           value={newTip}
           onChange={(e) => setNewTip(e.target.value)}
-          className="w-full p-2 border border-orange-400 rounded mb-2"
+          className="w-full p-2 border border-orange-400 rounded mb-2 transition-all duration-300 focus:border-orange-600 focus:outline-none"
         />
         <button
           onClick={handleAddTip}
-          className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
+          className="w-full flex items-center justify-center bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors duration-300"
         >
-          Add Tip
+          <FaPlus className="mr-2" /> Add Tip
         </button>
       </div>
 
@@ -88,7 +88,7 @@ const TipGenerator = () => {
         {tips.map((tip) => (
           <div
             key={tip.id}
-            className="flex items-center justify-between bg-orange-100 p-2 rounded mb-2"
+            className="flex items-center justify-between bg-white shadow-md p-4 rounded mb-2 transition-all duration-300 hover:shadow-lg"
           >
             {editTipId === tip.id ? (
               <input
@@ -103,15 +103,15 @@ const TipGenerator = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => setEditTipId(tip.id)}
-                className="text-blue-500 hover:text-blue-600"
+                className="text-blue-500 hover:text-blue-600 transition duration-300"
               >
-                Edit
+                <FaEdit />
               </button>
               <button
                 onClick={() => handleDeleteTip(tip.id)}
-                className="text-red-500 hover:text-red-600"
+                className="text-red-500 hover:text-red-600 transition duration-300"
               >
-                Delete
+                <FaTrash />
               </button>
             </div>
           </div>
@@ -120,28 +120,28 @@ const TipGenerator = () => {
 
       {/* Recommendations Form */}
       <div className="mb-4">
-        <h3 className="text-xl font-semibold text-orange-600 mb-2">Get Exercise Recommendations</h3>
+        <h3 className="text-2xl font-semibold text-orange-600 mb-2">Get Exercise Recommendations</h3>
         <div className="flex flex-col sm:flex-row gap-2 mb-4">
           <input
             type="number"
             placeholder="Height (cm)"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
-            className="w-full sm:w-1/2 p-2 border border-orange-400 rounded"
+            className="w-full sm:w-1/2 p-2 border border-orange-400 rounded transition-all duration-300 focus:border-orange-600 focus:outline-none"
           />
           <input
             type="number"
             placeholder="Weight (kg)"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-            className="w-full sm:w-1/2 p-2 border border-orange-400 rounded"
+            className="w-full sm:w-1/2 p-2 border border-orange-400 rounded transition-all duration-300 focus:border-orange-600 focus:outline-none"
           />
         </div>
         <button
-          onClick={handleGetRecommendations} // No parentheses here
-          className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
+          onClick={handleGetRecommendations}
+          className="w-full flex items-center justify-center bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors duration-300"
         >
-          Get Recommendations
+          <FaRunning className="mr-2" /> Get Recommendations
         </button>
       </div>
 
@@ -149,7 +149,7 @@ const TipGenerator = () => {
       <div className="mt-4">
         {recommendations.length > 0 && (
           <>
-            <h3 className="text-xl font-semibold text-orange-600 mb-2">Recommended Exercises</h3>
+            <h3 className="text-2xl font-semibold text-orange-600 mb-2">Recommended Exercises</h3>
             <ul className="list-disc list-inside">
               {recommendations.map((exercise, index) => (
                 <li key={index} className="text-gray-800">{exercise.name}</li>
@@ -161,33 +161,35 @@ const TipGenerator = () => {
 
       {/* Health Information Form */}
       <div className="mb-4">
-        <h3 className="text-xl font-semibold text-orange-600 mb-2">Get Health Information</h3>
-        <input
-          type="text"
-          placeholder="Enter a food item (e.g., apple)"
-          value={foodItem}
-          onChange={(e) => setFoodItem(e.target.value)}
-          className="w-full p-2 border border-orange-400 rounded mb-2"
-        />
-        <input
-          type="text"
-          placeholder="Enter an exercise query (e.g., running for 10 minutes)"
-          value={exerciseQuery}
-          onChange={(e) => setExerciseQuery(e.target.value)}
-          className="w-full p-2 border border-orange-400 rounded mb-4"
-        />
+        <h3 className="text-2xl font-semibold text-orange-600 mb-2">Get Health Information</h3>
+        <div className="flex flex-col mb-4">
+          <input
+            type="text"
+            placeholder="Enter a food item (e.g., apple)"
+            value={foodItem}
+            onChange={(e) => setFoodItem(e.target.value)}
+            className="w-full p-2 border border-orange-400 rounded mb-2 transition-all duration-300 focus:border-orange-600 focus:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="Enter an exercise query (e.g., running for 10 minutes)"
+            value={exerciseQuery}
+            onChange={(e) => setExerciseQuery(e.target.value)}
+            className="w-full p-2 border border-orange-400 rounded mb-2 transition-all duration-300 focus:border-orange-600 focus:outline-none"
+          />
+        </div>
         <button
           onClick={handleGetHealthInfo}
-          className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
+          className="w-full flex items-center justify-center bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors duration-300"
         >
-          Get Health Info
+          <FaAppleAlt className="mr-2" /> Get Health Info
         </button>
       </div>
 
       {/* Health Information Display */}
       {healthInfo && (
-        <div className="mt-4">
-          <h3 className="text-xl font-semibold text-orange-600 mb-2">Health Info Summary</h3>
+        <div className="mt-4 p-4 bg-white shadow-md rounded">
+          <h3 className="text-2xl font-semibold text-orange-600 mb-2">Health Info Summary</h3>
           <p className="text-gray-800">Calories Gained: {healthInfo.caloriesGained}</p>
           <p className="text-gray-800">Carbohydrates: {healthInfo.totalCarbohydrates}g</p>
           <p className="text-gray-800">Protein: {healthInfo.totalProtein}g</p>
