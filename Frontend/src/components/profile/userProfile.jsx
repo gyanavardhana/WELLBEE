@@ -78,7 +78,7 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    fetchProfile();
+fetchProfile();
   }, []);
 
   const handleInputChange = (e) => {

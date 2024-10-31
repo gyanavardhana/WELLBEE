@@ -249,8 +249,9 @@ const TherapistProfile = () => {
   
 
   useEffect(() => {
-    fetchTherapistProfile();
-    fetchAvailableSlots(); // Fetch slots on initial load
+
+      fetchTherapistProfile();
+      fetchAvailableSlots();
   }, []);
 
   return (

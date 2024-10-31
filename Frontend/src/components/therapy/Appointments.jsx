@@ -84,7 +84,7 @@ const Appointments = () => {
       }
     };
 
-    fetchAppointments();
+fetchAppointments();
   }, [userRole]);
 
   const handleDeleteAppointment = async (appointmentId) => {
