@@ -1,104 +1,45 @@
 import React, { useState } from "react";
 import Navbar from "../../components/common/Navbar";
+import TipGenerator from "../../components/dashboard/TipGenerator";
+import MetricsWatcher from "../../components/dashboard/MetricWatcher";
+
 const Dashboard = () => {
-  const [formData, setFormData] = useState({ height: "", weight: "" });
-  const [recommendations, setRecommendations] = useState(null);
-
-  // Handle input change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Mock personalized recommendations (this would usually come from a backend API)
-    const mockRecommendations = {
-      exercise: "30 minutes of jogging daily",
-      diet: "Increase protein intake and reduce sugar",
-    };
-
-    setRecommendations(mockRecommendations);
-  };
+  const [activeTab, setActiveTab] = useState("tips");
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen mt-24 flex bg-orange-100">
-        {/* Main dashboard content */}
-        <div className="w-full p-8">
-          <h1 className="text-2xl font-bold text-orange-600 mb-6">
-            Personalized Coaching Dashboard
-          </h1>
+      <div className="flex flex-col lg:flex-row min-h-screen bg-orange-100 mt-24">
+        {/* Sidebar for larger screens, horizontal nav for small screens */}
+        <div className="lg:w-1/5 bg-orange-200 p-6 lg:p-8 flex lg:flex-col flex-row justify-around lg:justify-start">
+          <nav className="space-y-4 lg:space-y-4 flex lg:flex-col flex-row space-x-4 lg:space-x-0 w-full">
+            <button
+              onClick={() => setActiveTab("tips")}
+              className={`flex items-center text-lg lg:text-xl p-2 lg:p-3 w-full lg:w-auto rounded-md transition duration-300 ${
+                activeTab === "tips"
+                  ? "bg-orange-600 text-white"
+                  : "bg-orange-200 hover:bg-orange-300"
+              }`}
+            >
+              Tips
+            </button>
+            <button
+              onClick={() => setActiveTab("metrics")}
+              className={`flex items-center text-lg lg:text-xl p-2 lg:p-3 w-full lg:w-auto rounded-md transition duration-300 ${
+                activeTab === "metrics"
+                  ? "bg-orange-600 text-white"
+                  : "bg-orange-200 hover:bg-orange-300"
+              }`}
+            >
+              Metrics Watcher
+            </button>
+          </nav>
+        </div>
 
-          {/* Form Section */}
-          <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 font-bold mb-2"
-                  htmlFor="height"
-                >
-                  Height (in cm)
-                </label>
-                <input
-                  type="number"
-                  id="height"
-                  name="height"
-                  value={formData.height}
-                  onChange={handleInputChange}
-                  className="w-full p-3 border border-orange-300 rounded focus:outline-none focus:border-orange-500"
-                  placeholder="Enter your height"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 font-bold mb-2"
-                  htmlFor="weight"
-                >
-                  Weight (in kg)
-                </label>
-                <input
-                  type="number"
-                  id="weight"
-                  name="weight"
-                  value={formData.weight}
-                  onChange={handleInputChange}
-                  className="w-full p-3 border border-orange-300 rounded focus:outline-none focus:border-orange-500"
-                  placeholder="Enter your weight"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none"
-              >
-                Get Recommendations
-              </button>
-            </form>
-          </div>
-
-          {/* Recommendations Section */}
-          {recommendations && (
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <h2 className="text-xl font-bold text-orange-600 mb-4">
-                Your Personalized Recommendations
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-orange-200 rounded">
-                  <h3 className="text-lg font-bold mb-2">Exercise</h3>
-                  <p>{recommendations.exercise}</p>
-                </div>
-                <div className="p-4 bg-orange-200 rounded">
-                  <h3 className="text-lg font-bold mb-2">Diet</h3>
-                  <p>{recommendations.diet}</p>
-                </div>
-              </div>
-            </div>
-          )}
+        {/* Main Content Area */}
+        <div className="w-full lg:w-4/5 bg-orange-100 p-6 lg:p-8">
+          {activeTab === "tips" && <TipGenerator />}
+          {activeTab === "metrics" && <MetricsWatcher />}
         </div>
       </div>
     </>
