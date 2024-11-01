@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../../components/common/Navbar";
-import TipGenerator from "../../components/dashboard/TipGenerator";
 import MetricsWatcher from "../../components/dashboard/MetricWatcher";
+import Generator from "../../components/dashboard/Generator";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("tips");
@@ -41,7 +41,7 @@ const Dashboard = () => {
 
         {/* Main Content Area */}
         <div className="w-full lg:w-4/5 bg-orange-100 p-6 lg:p-8">
-          {activeTab === "tips" && <TipGenerator />}
+          {activeTab === "tips" && <Generator />}
           {activeTab === "metrics" && <MetricsWatcher />}
         </div>
       </div>

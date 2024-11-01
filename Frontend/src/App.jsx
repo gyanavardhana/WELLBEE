@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Chatbot from "./chat";
 import VultrChatbot from "./vultrbot";
 import Profile from "./pages/Profile/Profile";
+import Generator from "./components/dashboard/Generator";
 import "./index.css";
 const App = () => {
   return (
@@ -23,7 +24,7 @@ const App = () => {
       <Route path="/chat" element={<Chat />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/x" element={<Chatbot />} />
+      <Route path="/x" element={<Generator />} />
     </Routes>
     </>
   );
