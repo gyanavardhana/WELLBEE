@@ -14,6 +14,7 @@ const roomCounts = {};
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
+    socket.emit('message', `Welcome, user ${socket.id}`);
 
     // Assign user to a room with available space or create a new room
     socket.on('joinRoom', () => {
@@ -23,6 +24,7 @@ io.on('connection', (socket) => {
 
         // Update room count
         roomCounts[room] = (roomCounts[room] || 0) + 1;
+        io.to(room).emit('roomCount', roomCounts[room]);
         io.to(room).emit('message', `User ${socket.id} joined room ${room}`);
     });
 
@@ -39,6 +41,7 @@ io.on('connection', (socket) => {
         const room = Array.from(socket.rooms)[1];
         if (room) {
             roomCounts[room] -= 1;
+            io.to(room).emit('roomCount', roomCounts[room]);
             if (roomCounts[room] === 0) {
                 // Remove empty rooms from the queue
                 const roomIndex = roomQueue.indexOf(room);
