@@ -23,6 +23,7 @@ io.on('connection', (socket) => {
 
         // Update room count
         roomCounts[room] = (roomCounts[room] || 0) + 1;
+        io.to(socket.id).emit('roomCount', roomCounts[room]);
         io.to(room).emit('message', `User ${socket.id} joined room ${room}`);
     });
 
