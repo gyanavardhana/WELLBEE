@@ -23,6 +23,9 @@ const Dashboard = () => {
             >
               Tips
             </button>
+            
+          
+            
             <button
               onClick={() => setActiveTab("metrics")}
               className={`flex items-center text-lg lg:text-xl p-2 lg:p-3 w-full lg:w-auto rounded-md transition duration-300 ${
