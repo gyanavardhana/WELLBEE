@@ -5,6 +5,7 @@ import coachingImage from '../../assets/images/personalcoaching.svg';
 import chatImage from '../../assets/images/groupchat.svg';
 import moodMeterImage from '../../assets/images/moodmeter.svg';
 import therapyImage from '../../assets/images/therapy.svg';
+import VultrChatbot from "../../components/common/VultrChatbot";
 
 const Home = () => {
   return (
@@ -156,7 +157,9 @@ const Home = () => {
             </div>
           </div>
         </footer>
+        
       </div>
+      <VultrChatbot />
     </div>
   );
 };
