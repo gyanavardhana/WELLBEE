@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const TherapyAI = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatHistory, loading]);
 
   const sendMessage = async () => {
     if (!userInput.trim()) return;
@@ -36,6 +47,25 @@ const TherapyAI = () => {
     sendMessage();
   };
 
+  // Custom components for markdown rendering
+  const MarkdownComponents = {
+    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+    ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+    ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
+    li: ({ children }) => <li className="mb-1">{children}</li>,
+    h1: ({ children }) => <h1 className="text-xl font-bold mb-2">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-lg font-bold mb-2">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-base font-bold mb-2">{children}</h3>,
+    code: ({ children }) => (
+      <code className="bg-gray-100 px-1 py-0.5 rounded text-sm">{children}</code>
+    ),
+    pre: ({ children }) => (
+      <pre className="bg-gray-100 p-2 rounded mb-2 overflow-x-auto">
+        {children}
+      </pre>
+    ),
+  };
+
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
       {/* Header */}
@@ -47,7 +77,10 @@ const TherapyAI = () => {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 p-4 overflow-y-auto bg-orange-50">
+      <div 
+        ref={chatContainerRef}
+        className="flex-1 p-4 overflow-y-auto bg-orange-50 scroll-smooth"
+      >
         <div className="space-y-4">
           {chatHistory.length === 0 && (
             <div className="text-center text-gray-500 py-8">
@@ -67,7 +100,12 @@ const TherapyAI = () => {
                     : 'bg-white shadow-md rounded-bl-none'
                 }`}
               >
-                {msg.text}
+                <ReactMarkdown 
+                  components={MarkdownComponents}
+                  className={`prose ${msg.sender === 'user' ? 'prose-invert' : ''} max-w-none`}
+                >
+                  {msg.text}
+                </ReactMarkdown>
               </div>
             </div>
           ))}
@@ -78,6 +116,7 @@ const TherapyAI = () => {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
