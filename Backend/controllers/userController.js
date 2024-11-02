@@ -1,7 +1,11 @@
-const prisma = require('../db/db'); 
+const prisma = require('../db/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const logger = require("../logger/logger");
+const multer = require('multer');
+const { S3 } = require('@aws-sdk/client-s3');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Generate salt for hashing passwords
 const generateSalt = async () => {
@@ -182,4 +186,44 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { signup, login, getUserProfile, updateUserProfile, deleteUser };
+
+
+const s3 = new S3({
+    endpoint: 'https://blr1.vultrobjects.com',
+    region: 'auto', // Use 'auto' for Vultr
+    credentials: {
+        accessKeyId: process.env.VULTR_ACCESS_KEY, // Replace with your access key
+        secretAccessKey: process.env.VULTR_SECRET_KEY, // Replace with your secret key
+    },
+});
+
+const uploadImage = async (req, res) => {
+    const file = req.file; // Get the uploaded file from the request
+
+    if (!file) {
+        return res.status(400).json({ message: 'No file uploaded.' });
+    }
+
+    const uploadParams = {
+        Bucket: 'yelpcamp', // Your bucket name
+        Key: file.originalname, // Use the original file name as the key
+        Body: file.buffer, // Use the file buffer directly
+        ContentType: file.mimetype, // Set the content type
+        ACL: 'public-read', // Set the access control
+    };
+
+    try {
+        // Upload the file to S3
+        await s3.putObject(uploadParams);
+
+        // Construct the file URL
+        const fileUrl = `https://blr1.vultrobjects.com/yelpcamp/${uploadParams.Key}`;
+            res.status(200).json({ message: 'File uploaded successfully', url: fileUrl });
+    } catch (err) {
+        console.error('Upload Error:', err);
+        res.status(500).json({ message: 'Error uploading to Vultr', error: err });
+    }
+};
+
+
+module.exports = { signup, login, getUserProfile, updateUserProfile, deleteUser, uploadImage };

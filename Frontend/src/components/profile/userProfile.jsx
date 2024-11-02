@@ -2,9 +2,87 @@ import React, { useState, useEffect } from "react";
 import { updateUserProfile, getUserProfile } from "../../services/userServices";
 import { TextField, Button } from "@mui/material";
 import { FaUser, FaEnvelope, FaRulerVertical, FaWeight, FaUserTag } from "react-icons/fa";
-import { Loader2, Save, Edit2, X } from "lucide-react";
+import { Loader2, Save, Edit2, X, Upload } from "lucide-react";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
+
+const ImageUploadField = ({ currentImage, onImageUpdate, isEditing }) => {
+  const [previewUrl, setPreviewUrl] = useState(currentImage);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload image
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_APP_URL}users/upload`,{
+        method: 'POST',
+        body: formData,
+      });
+      const result = await response.json();
+      onImageUpdate(result.url);
+      toast.success("Image uploaded successfully!");
+    } catch (error) {
+      toast.error("Error uploading image");
+      setPreviewUrl(currentImage); // Revert preview on error
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="mb-6">
+      <label className="mb-1 text-amber-700 flex items-center">
+        <FaUser className="text-amber-500" />
+        <span className="ml-2">Profile Picture:</span>
+      </label>
+      
+      <div className="relative">
+        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-amber-500 bg-amber-50">
+          {previewUrl ? (
+            <img 
+              src={previewUrl} 
+              alt="Profile" 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-amber-100">
+              <FaUser size={40} className="text-amber-500" />
+            </div>
+          )}
+        </div>
+        
+        {isEditing && (
+          <div className="mt-2">
+            <label className="cursor-pointer inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg">
+              <Upload size={20} />
+              {isUploading ? "Uploading..." : "Change Picture"}
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={isUploading}
+              />
+            </label>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const EditableField = ({ label, value, name, onChange, icon, isEditing }) => {
   return (
@@ -78,12 +156,16 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-fetchProfile();
+    fetchProfile();
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setProfileForm({ ...profileForm, [name]: value });
+  };
+
+  const handleImageUpdate = (url) => {
+    setProfileForm({ ...profileForm, profilePic: url });
   };
 
   const handleProfileSubmit = async () => {
@@ -105,7 +187,7 @@ fetchProfile();
   };
 
   const handleCancel = () => {
-    fetchProfile(); // Reset to last saved values
+    fetchProfile();
     setIsEditing(false);
   };
 
@@ -143,18 +225,16 @@ fetchProfile();
               </div>
             ) : (
               <div className="space-y-4">
+                <ImageUploadField 
+                  currentImage={profileForm.profilePic}
+                  onImageUpdate={handleImageUpdate}
+                  isEditing={isEditing}
+                />
+                
                 <EditableField
                   label="Name"
                   value={profileForm.name}
                   name="name"
-                  onChange={handleInputChange}
-                  icon={<FaUser className="text-amber-500" />}
-                  isEditing={isEditing}
-                />
-                <EditableField
-                  label="Profile Picture URL"
-                  value={profileForm.profilePic}
-                  name="profilePic"
                   onChange={handleInputChange}
                   icon={<FaUser className="text-amber-500" />}
                   isEditing={isEditing}
@@ -186,16 +266,6 @@ fetchProfile();
                   label="Role"
                   value={profileForm.role}
                   icon={<FaUserTag className="text-amber-500" />}
-                />
-                <DisplayField
-                  label="Created At"
-                  value={new Date(profileForm.createdAt).toLocaleDateString()}
-                  icon={<FaUser className="text-amber-500" />}
-                />
-                <DisplayField
-                  label="Last Updated"
-                  value={new Date(profileForm.updatedAt).toLocaleDateString()}
-                  icon={<FaUser className="text-amber-500" />}
                 />
 
                 <AnimatePresence>
