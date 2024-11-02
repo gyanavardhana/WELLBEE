@@ -1,38 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from "../../components/common/Navbar";
 import io from "socket.io-client";
 import { createChatMessage } from "../../services/chatServices";
 import { getUserProfile } from "../../services/userServices";
-import { Smile, Send, Users } from "lucide-react";
+import { Smile, Send, Users, LogOut, RefreshCw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const sentimentScores = {
-  sadness: 6,
-  disgust: 5,
-  surprise: 4,
-  fear: 3,
-  anger: 2,
-  neutral: 0,
-  joy: 1,
-};
-
-const emotionEmojis = {
-  Sadness: "😢",
-  Disgust: "🤢",
-  Surprise: "😮",
-  Fear: "😨",
-  Anger: "😠",
-  Neutral: "😐",
-  Joy: "😊",
-  Unknown: "❓"
-};
-
+const sentimentScores = { sadness: 6, disgust: 5, surprise: 4, fear: 3, anger: 2, neutral: 0, joy: 1 };
+const emotionEmojis = { Sadness: "😢", Disgust: "🤢", Surprise: "😮", Fear: "😨", Anger: "😠", Neutral: "😐", Joy: "😊", Unknown: "❓" };
 const emojiList = ["😊", "😂", "❤️", "👍", "🎉", "🔥", "💯", "🤔", "👋", "✨", "🙌", "💪", "🎮", "🌟", "🤩"];
 
 const getEmotionFromScore = (score) => {
   for (const [emotion, scoreValue] of Object.entries(sentimentScores)) {
-    if (scoreValue === score) {
-      return emotion.charAt(0).toUpperCase() + emotion.slice(1);
-    }
+    if (scoreValue === score) return emotion.charAt(0).toUpperCase() + emotion.slice(1);
   }
   return "Unknown";
 };
@@ -46,6 +26,12 @@ const Chat = () => {
   const [showEmojis, setShowEmojis] = useState(false);
   const chatEndRef = useRef(null);
   const socket = useRef(null);
+  const navigate = useNavigate();
+
+  const navigateToHome = useCallback(() => {
+    const timer = setTimeout(() => navigate("/"), 1500);
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   useEffect(() => {
     socket.current = io("http://localhost:3001");
@@ -58,21 +44,44 @@ const Chat = () => {
         time: new Date().toLocaleTimeString(),
         emotion: "Joy"
       };
-      setMessages(prev => [...prev, welcomeMessage]);
+      setMessages((prev) => [...prev, welcomeMessage]);
+      
+    });
+    socket.current.emit("joinRoom");
+    socket.current.on("roomCount", (count) => {
+        console.log(`Room count updated: ${count}`);
+        setRoomCount(count);
     });
 
-    socket.current.emit("joinRoom");
+
 
     socket.current.on("message", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      if (typeof message === "string") {
+        // Handle system message for users joining
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: message, sender: "System", time: new Date().toLocaleTimeString(), emotion: "Joy" }
+        ]);
+      } else {
+        // Handle regular chat messages
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
     });
 
-    socket.current.on("roomCount", (count) => {
-      setRoomCount(count);
-    });
+    
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = ""; // Alert prompt for user
+      socket.current.emit("leaveRoom"); // Emit a 'leaveRoom' event to decrease the count on reload
+      socket.current.disconnect();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       socket.current.disconnect();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 
@@ -97,7 +106,7 @@ const Chat = () => {
   }, [messages]);
 
   const handleEmojiClick = (emoji) => {
-    setNewMessage(prev => prev + emoji);
+    setNewMessage((prev) => prev + emoji);
     setShowEmojis(false);
   };
 
@@ -142,6 +151,19 @@ const Chat = () => {
     }
   };
 
+  const handleExitChat = () => {
+    socket.current.emit("leaveRoom");
+    //update room count
+    setRoomCount(0);
+    navigateToHome();
+  };
+
+  const handleJoinAnotherGroup = () => {
+    if (roomCount === 5) {
+      window.open(window.location.href, "_blank");
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
       <Navbar />
@@ -155,6 +177,14 @@ const Chat = () => {
                 <Users size={16} className="mr-1 md:mr-2" />
                 <span className="text-sm">{roomCount}</span>
               </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={handleExitChat} className="flex items-center bg-red-500 text-white p-2 rounded-full hover:bg-red-600">
+                <LogOut size={20} /> <span className="ml-1">Exit</span>
+              </button>
+              <button onClick={handleJoinAnotherGroup} className="flex items-center bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
+                <RefreshCw size={20} /> <span className="ml-1">Join Another Group</span>
+              </button>
             </div>
           </div>
 
@@ -178,22 +208,15 @@ const Chat = () => {
                       message.sender === "System"
                         ? "bg-gradient-to-r from-gray-100 to-gray-200 text-center mx-auto"
                         : message.sender === socketId
-                        ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white"
-                        : "bg-gradient-to-r from-gray-200 to-gray-300"
+                        ? "bg-orange-500 text-white"
+                        : "bg-white"
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-xs md:text-sm">
-                        {message.sender === "System" ? "System" : message.sender === socketId ? "You" : userName}
-                      </span>
-                      <span className="text-xl md:text-2xl" title={message.emotion}>
-                        {emotionEmojis[message.emotion]}
-                      </span>
+                    <p>{message.text}</p>
+                    <div className="text-xs text-gray-500">
+                      <span>{message.sender}</span> &bull; <span>{message.time}</span>
+                      <span className="ml-2">{emotionEmojis[message.emotion] || "❓"}</span>
                     </div>
-                    <p className="mb-1 text-sm md:text-base break-words">{message.text}</p>
-                    <p className={`text-xs ${message.sender === socketId ? "text-orange-100" : "text-gray-600"}`}>
-                      {message.time}
-                    </p>
                   </div>
                 </div>
               ))
@@ -201,50 +224,31 @@ const Chat = () => {
             <div ref={chatEndRef} />
           </div>
 
-          {/* Input Area */}
-          <div className="bg-white p-3 md:p-4 border-t border-orange-100">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  className="w-full border border-orange-200 rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
-                  placeholder="Type your message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-400 hover:text-orange-600"
-                  onClick={() => setShowEmojis(!showEmojis)}
-                >
-                  <Smile size={20} className="md:w-6 md:h-6" />
-                </button>
-              </div>
-              <button
-                type="submit"
-                className="bg-orange-500 hover:bg-orange-600 text-white p-2 md:p-3 rounded-full transition-colors duration-200"
-              >
-                <Send size={20} className="md:w-6 md:h-6" />
-              </button>
-            </form>
-
-            {/* Emoji Picker */}
+          {/* Input Section */}
+          <form className="p-3 md:p-4 flex gap-2" onSubmit={handleSendMessage}>
             {showEmojis && (
-              <div className="absolute bottom-20 right-4 bg-white p-3 md:p-4 rounded-xl shadow-lg border border-orange-200">
-                <div className="grid grid-cols-5 gap-1 md:gap-2">
-                  {emojiList.map((emoji, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleEmojiClick(emoji)}
-                      className="text-xl md:text-2xl hover:bg-orange-100 p-1 md:p-2 rounded-lg transition-colors duration-200"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
+              <div className="absolute bg-white border rounded-md p-2 z-10">
+                {emojiList.map((emoji) => (
+                  <span key={emoji} onClick={() => handleEmojiClick(emoji)} className="cursor-pointer">
+                    {emoji}
+                  </span>
+                ))}
               </div>
             )}
-          </div>
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 border rounded-lg p-2"
+            />
+            <button type="button" onClick={() => setShowEmojis(!showEmojis)} className="p-2">
+              <Smile size={20} />
+            </button>
+            <button type="submit" className="bg-orange-500 text-white rounded-lg px-4 py-2 hover:bg-orange-600">
+              Send
+            </button>
+          </form>
         </div>
       </div>
     </div>
