@@ -3,7 +3,11 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 const cors = require('cors')
+const swaggerSpec = require('./swaggerConfig');
+const swaggerUi = require('swagger-ui-express');
 app.use(express.json());
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatmessageRoutes');
@@ -16,7 +20,7 @@ const therapyappointmentRoutes = require('./routes/therapyappointmentRoutes');
 const spotifyRoutes = require('./routes/spotifyRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const vultrRoutes = require('./routes/vultrRoutes');
-const fitbitRoutes= require('./routes/fitbitRoutes')
+const fitbitRoutes= require('./routes/fitbitRoutes');
 
 app.get('/', (req, res) => {
     res.send('Hello World');
