@@ -30,6 +30,8 @@
     "pack": "file:",
     "socket.io": "^4.8.1",
     "spotify-web-api-node": "^5.0.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.15.0"
   }
 }
