@@ -127,4 +127,4 @@ exports.getVultrChatResponse = async (req, res) => {
         logger.error(`An error occurred while fetching response from Vultr API: ${error.message}`);
         res.status(500).json({ error: 'An error occurred while fetching response from Vultr API.' });
     }
-};
+}

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Navbar from "../../components/common/Navbar";
+import { motion, AnimatePresence } from "framer-motion";
 import io from "socket.io-client";
-import { createChatMessage } from "../../services/chatServices";
-import { getUserProfile } from "../../services/userServices";
 import { Smile, Send, Users, LogOut, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { createChatMessage } from "../../services/chatServices";
+import { getUserProfile } from "../../services/userServices";
+import Navbar from "../../components/common/Navbar";
 
 const sentimentScores = { sadness: 6, disgust: 5, surprise: 4, fear: 3, anger: 2, neutral: 0, joy: 1 };
 const emotionEmojis = { Sadness: "😢", Disgust: "🤢", Surprise: "😮", Fear: "😨", Anger: "😠", Neutral: "😐", Joy: "😊", Unknown: "❓" };
@@ -17,6 +18,37 @@ const getEmotionFromScore = (score) => {
   return "Unknown";
 };
 
+const getRandomPosition = () => ({
+  x: Math.random() * 200 - 100, // Random x position between -100 and 100
+  y: Math.random() * 50 - 25,   // Random y position between -25 and 25
+});
+
+const FloatingEmoji = ({ emoji, onComplete }) => {
+  const randomPos = getRandomPosition();
+  
+  return (
+    <motion.div
+      initial={{ y: 0, x: randomPos.x, opacity: 1, scale: 1 }}
+      animate={{ 
+        y: -150,
+        x: randomPos.x + (Math.random() * 40 - 20), // Add some random horizontal movement
+        opacity: 0,
+        scale: 2.5,
+        rotate: Math.random() * 360 // Random rotation
+      }}
+      exit={{ opacity: 0 }}
+      transition={{ 
+        duration: 2 + Math.random(), // Random duration between 2-3 seconds
+        ease: "easeOut"
+      }}
+      onAnimationComplete={onComplete}
+      className="absolute bottom-0 left-1/2 transform -translate-x-1/2 pointer-events-none text-4xl"
+    >
+      {emoji}
+    </motion.div>
+  );
+};
+
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -24,6 +56,7 @@ const Chat = () => {
   const [roomCount, setRoomCount] = useState(0);
   const [userName, setUserName] = useState("Anonymous");
   const [showEmojis, setShowEmojis] = useState(false);
+  const [floatingEmojis, setFloatingEmojis] = useState([]);
   const chatEndRef = useRef(null);
   const socket = useRef(null);
   const navigate = useNavigate();
@@ -34,7 +67,7 @@ const Chat = () => {
   }, [navigate]);
 
   useEffect(() => {
-    socket.current = io("http://localhost:3001");
+    socket.current = io(`${import.meta.env.VITE_APP_SOCKET_URL}`);
 
     socket.current.on("connect", () => {
       setSocketId(socket.current.id);
@@ -45,35 +78,29 @@ const Chat = () => {
         emotion: "Joy"
       };
       setMessages((prev) => [...prev, welcomeMessage]);
-      
     });
+
     socket.current.emit("joinRoom");
     socket.current.on("roomCount", (count) => {
-        console.log(`Room count updated: ${count}`);
-        setRoomCount(count);
+      console.log(`Room count updated: ${count}`);
+      setRoomCount(count);
     });
-
-
 
     socket.current.on("message", (message) => {
       if (typeof message === "string") {
-        // Handle system message for users joining
         setMessages((prevMessages) => [
           ...prevMessages,
           { text: message, sender: "System", time: new Date().toLocaleTimeString(), emotion: "Joy" }
         ]);
       } else {
-        // Handle regular chat messages
         setMessages((prevMessages) => [...prevMessages, message]);
       }
     });
 
-    
-
     const handleBeforeUnload = (event) => {
       event.preventDefault();
-      event.returnValue = ""; // Alert prompt for user
-      socket.current.emit("leaveRoom"); // Emit a 'leaveRoom' event to decrease the count on reload
+      event.returnValue = "";
+      socket.current.emit("leaveRoom");
       socket.current.disconnect();
     };
 
@@ -97,13 +124,29 @@ const Chat = () => {
     fetchUserProfile();
   }, []);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const addFloatingEmoji = useCallback((emotion) => {
+    const numberOfEmojis = Math.floor(Math.random() * 3) + 2; // Random number between 2-4 emojis
+    const emoji = emotionEmojis[emotion] || "❓";
+    
+    for (let i = 0; i < numberOfEmojis; i++) {
+      setTimeout(() => {
+        const id = Date.now() + i;
+        setFloatingEmojis(prev => [...prev, { id, emoji }]);
+        
+        setTimeout(() => {
+          setFloatingEmojis(prev => prev.filter(e => e.id !== id));
+        }, 3000); // Increased duration to match the longer animation
+      }, i * 200); // Stagger the appearance of emojis
+    }
+  }, []);
 
   const handleEmojiClick = (emoji) => {
     setNewMessage((prev) => prev + emoji);
@@ -136,6 +179,8 @@ const Chat = () => {
             : msg
         )
       );
+      
+      addFloatingEmoji(emotion);
     } catch (error) {
       console.error("Error creating chat message:", error);
       const randomEmotion = Object.keys(sentimentScores)[Math.floor(Math.random() * Object.keys(sentimentScores).length)];
@@ -148,12 +193,13 @@ const Chat = () => {
             : msg
         )
       );
+      
+      addFloatingEmoji(capitalizedRandomEmotion);
     }
   };
 
   const handleExitChat = () => {
     socket.current.emit("leaveRoom");
-    //update room count
     setRoomCount(0);
     navigateToHome();
   };
@@ -165,7 +211,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+    <div className="flex flex-col min-h-screen mt-10 bg-gradient-to-br from-orange-50 to-orange-100">
       <Navbar />
       <div className="flex-1 flex items-start justify-center p-4 mt-16 md:mt-20">
         <div className="w-full max-w-4xl bg-white shadow-2xl rounded-xl overflow-hidden flex flex-col h-[calc(100vh-8rem)]">
@@ -189,7 +235,7 @@ const Chat = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
+          <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-gradient-to-b from-orange-50 to-white relative">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
                 <Smile size={48} className="mb-2 text-orange-300" />
@@ -214,25 +260,42 @@ const Chat = () => {
                   >
                     <p>{message.text}</p>
                     <div className="text-xs text-gray-500">
-                      <span>{message.sender}</span> &bull; <span>{message.time}</span>
-                      <span className="ml-2">{emotionEmojis[message.emotion] || "❓"}</span>
+                       <span>{message.time}</span>
+                      <span className="ml-2 text-lg">{emotionEmojis[message.emotion] || "❓"}</span>
                     </div>
                   </div>
                 </div>
               ))
             )}
             <div ref={chatEndRef} />
+            
+            {/* Floating Emojis */}
+            <AnimatePresence>
+              {floatingEmojis.map(({ id, emoji }) => (
+                <FloatingEmoji
+                  key={id}
+                  emoji={emoji}
+                  onComplete={() => setFloatingEmojis(prev => prev.filter(e => e.id !== id))}
+                />
+              ))}
+            </AnimatePresence>
           </div>
 
           {/* Input Section */}
           <form className="p-3 md:p-4 flex gap-2" onSubmit={handleSendMessage}>
             {showEmojis && (
-              <div className="absolute bg-white border rounded-md p-2 z-10">
-                {emojiList.map((emoji) => (
-                  <span key={emoji} onClick={() => handleEmojiClick(emoji)} className="cursor-pointer">
-                    {emoji}
-                  </span>
-                ))}
+              <div className="absolute bottom-16 bg-white border rounded-md p-2 z-10 text-2xl">
+                <div className="grid grid-cols-5 gap-2">
+                  {emojiList.map((emoji) => (
+                    <span
+                      key={emoji}
+                      onClick={() => handleEmojiClick(emoji)}
+                      className="cursor-pointer hover:scale-125 transition-transform"
+                    >
+                      {emoji}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
             <input
@@ -243,10 +306,10 @@ const Chat = () => {
               className="flex-1 border rounded-lg p-2"
             />
             <button type="button" onClick={() => setShowEmojis(!showEmojis)} className="p-2">
-              <Smile size={20} />
+              <Smile size={24} />
             </button>
             <button type="submit" className="bg-orange-500 text-white rounded-lg px-4 py-2 hover:bg-orange-600">
-              Send
+              <Send size={24} />
             </button>
           </form>
         </div>
