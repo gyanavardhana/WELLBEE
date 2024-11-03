@@ -1,5 +1,5 @@
 # Use the Node.js basic image 
-FROM node:alpine
+FROM node:lts AS development
 
 # Set the working directory of the application 
 WORKDIR ./
@@ -8,10 +8,10 @@ WORKDIR ./
 COPY package*.json ./
 
 # Install all the dependencies for the backend application
-RUN npm Install
+RUN npm install
 
 # Copy the rest of the files. 
-COPY ./
+COPY . ./
 
 # Expose the ports on which the frontend application runs
 EXPOSE 5173

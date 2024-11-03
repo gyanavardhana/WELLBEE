@@ -1,6 +1,6 @@
 
 # Use a Node.js base image
-FROM node:alpine
+FROM node:lts AS development
 
 # Set the working directory inside the container
 WORKDIR /
@@ -9,10 +9,10 @@ WORKDIR /
 COPY package*.json ./
 
 # Install backend dependencies 
-RUN npm Install
+RUN npm install
 
 # Copy the rest of the backend files 
-COPY ..
+COPY . ./
 
 # Expose the port on which backend application runs 
 EXPOSE 3000 3001
