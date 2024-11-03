@@ -6,7 +6,7 @@ const createChatMessage = async (req, res) => {
     try {
         const { message } = req.body;
         const userId = req.userId; // Extracted from middleware
-        const response = await axios.post(process.env.FASTAPI_URL, {
+        const response = await axios.post(`${process.env.FASTAPI_URL}predict-emotion`, {
             text: message,
          });
         const newChatMessage = await prisma.chatMessage.create({

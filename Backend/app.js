@@ -25,9 +25,15 @@ const fitbitRoutes= require('./routes/fitbitRoutes');
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
+axios.get(`${process.env.FASTAPI_URL}hello`, {
+}).then((response) => {
+    console.log(response.data);
+}).catch((error) => {
+    console.error(error);
+});
 app.use(
     cors({
-        origin: 'http://localhost:5173',
+        origin: process.env.FRONTEND_URL,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],
     })
@@ -45,7 +51,7 @@ app.use('/appointment', therapyappointmentRoutes);
 app.use('/spotify', spotifyRoutes);
 app.use('/healthinfo', healthRoutes);
 app.use('/vultr', vultrRoutes);
-app.use('/fitbit',fitbitRoutes)
+app.use('/fitbit', fitbitRoutes)
 
 
 app.listen(3000, () => {
