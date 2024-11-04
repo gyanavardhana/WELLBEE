@@ -22,7 +22,6 @@ const spotifyRoutes = require('./routes/spotifyRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const vultrRoutes = require('./routes/vultrRoutes');
 const fitbitRoutes= require('./routes/fitbitRoutes');
-const logger = require('./logger/logger');
 
 app.get('/', (req, res) => {
     res.send('Hello World');
