@@ -1,4 +1,3 @@
-
 # Use a Node.js base image
 FROM node:lts AS development
 
@@ -7,9 +6,13 @@ WORKDIR /
 
 # Copy package.json and package-lock.json 
 COPY package*.json ./
+COPY prisma/schema.prisma ./
+
 
 # Install backend dependencies 
 RUN npm install
+RUN npm i -g prisma
+RUN prisma generate
 
 # Copy the rest of the backend files 
 COPY . ./

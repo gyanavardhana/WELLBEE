@@ -5,6 +5,7 @@ const axios = require('axios');
 const cors = require('cors')
 const swaggerSpec = require('./swaggerConfig');
 const swaggerUi = require('swagger-ui-express');
+const logger = require('./logger/logger')
 app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -21,15 +22,16 @@ const spotifyRoutes = require('./routes/spotifyRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const vultrRoutes = require('./routes/vultrRoutes');
 const fitbitRoutes= require('./routes/fitbitRoutes');
+const logger = require('./logger/logger');
 
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
 axios.get(`${process.env.FASTAPI_URL}hello`, {
 }).then((response) => {
-    console.log(response.data);
+    logger.info(response.data);
 }).catch((error) => {
-    console.error(error);
+    logger.error(error);
 });
 app.use(
     cors({

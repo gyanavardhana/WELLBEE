@@ -1,3 +1,4 @@
+const logger = require('./logger/logger')
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
@@ -13,13 +14,13 @@ const roomQueue = [];
 const roomCounts = {};
 
 io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
+    logger.info('A user connected:', socket.id);
     
 
     // Assign user to a room with available space or create a new room
     socket.on('joinRoom', () => {
         const room = findAvailableRoom();
-        console.log(`User ${socket.id} is joining room: ${room}`);
+        logger.info(`User ${socket.id} is joining room: ${room}`);
         socket.join(room);
 
         // Update room count
@@ -31,17 +32,17 @@ io.on('connection', (socket) => {
     // Handle message sending
     socket.on('sendMessage', (message) => {
         const room = Array.from(socket.rooms)[1];
-        console.log(`Message from ${socket.id} in room ${room}: ${message}`);
+        logger.info(`Message from ${socket.id} in room ${room}: ${message}`);
         io.to(room).emit('message', message);
     });
 
     // Handle user disconnect
     socket.on('disconnect', () => {
-        console.log(roomCounts);
+        logger.info(roomCounts);
         const room = Array.from(socket.rooms)[1];
         if (room) {
             roomCounts[room] -= 1;
-            console.log(roomCounts[room]);
+            logger.info(roomCounts[room]);
             if (roomCounts[room] === 0) {
                 // Remove empty rooms from the queue
                 const roomIndex = roomQueue.indexOf(room);
@@ -49,7 +50,7 @@ io.on('connection', (socket) => {
                 delete roomCounts[room];
             }
         }
-        console.log(`User ${socket.id} disconnected`);
+        logger.info(`User ${socket.id} disconnected`);
     });
 });
 
@@ -66,5 +67,5 @@ function findAvailableRoom() {
 
 // Start WebSocket server on port 3001
 socketServer.listen(3001, () => {
-    console.log(`Socket.IO server running on port 3001`);
+    logger.info(`Socket.IO server running on port 3001`);
 });

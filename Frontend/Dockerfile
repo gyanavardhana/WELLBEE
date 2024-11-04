@@ -17,4 +17,4 @@ COPY . ./
 EXPOSE 5173
 
 # Execute the command to run the application 
-RUN ["npm","run","dev"]
+CMD ["npm","run","dev"]
