@@ -67,7 +67,7 @@ const TherapyAI = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
+    <div className="flex flex-col h-3/4 max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
       {/* Header */}
       <div className="bg-orange-600 p-4 text-white">
         <h1 className="text-2xl font-bold flex items-center gap-2">
