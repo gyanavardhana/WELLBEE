@@ -141,7 +141,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Gyanavardhan](https://github.com/gyanavardhana) - Full stack and devops engineer
 - [Viswesh](https://github.com/Viswesh934) - Full stack and devops engineer
-- [Prem Kumar](GitHub Profile Link) - Devops engineer
+- [Prem Kumar](https://github.com/Manchina) - Devops engineer
 
 ## 🙏 Acknowledgments
 - Vultr Cloud Platform for hosting and infrastructure support
