@@ -2,7 +2,8 @@
 
 Well Bee is a comprehensive health and well-being platform designed to support and foster a healthy environment for users. The platform combines mental health support, physical wellness tracking, and personalized recommendations to provide a holistic approach to well-being.
 
-![Well Bee Logo](insert_logo_url_here)
+![Screenshot 2024-11-05 131110](https://github.com/user-attachments/assets/7adc583a-edfd-4724-80c9-241d0373be9e)
+
 
 ## 🌟 Features
 
@@ -138,9 +139,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-- [Gyanavardhan](GitHub Profile Link) - Full stack and devops engineer
-- [Viswesh](GitHub Profile Link) - Full stack and devops engineer
-- [Prem Kumar](GitHub Profile Link) - Devops engineer
+- [Gyanavardhan](https://github.com/gyanavardhana) - Full stack and devops engineer
+- [Viswesh](https://github.com/Viswesh934) - Full stack and devops engineer
+- [Prem Kumar](https://github.com/Manchina) - Devops engineer
 
 ## 🙏 Acknowledgments
 - Vultr Cloud Platform for hosting and infrastructure support
