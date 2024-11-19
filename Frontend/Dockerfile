@@ -1,6 +1,7 @@
 # Use the Node.js basic image 
 FROM node:lts AS development
 
+
 # Set the working directory of the application 
 WORKDIR /src
 
