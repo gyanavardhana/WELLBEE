@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import axios from "axios";
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
@@ -19,19 +20,17 @@ const App = () => {
       try {
         const apiUrl = import.meta.env.VITE_APP_URL;
         const socketUrl = import.meta.env.VITE_APP_SOCKET_URL;
-
+        console.log(apiUrl,socketUrl)
         if (apiUrl) {
-          const apiResponse = await fetch(apiUrl);
-          const apiData = await apiResponse.json();
-          console.log("API Response:", apiData);
+          const apiResponse = await axios.get(apiUrl);
+          console.log("API Response:", apiResponse.data);
         } else {
           console.warn("VITE_APP_URL is not defined in your environment variables.");
         }
 
         if (socketUrl) {
-          const socketResponse = await fetch(socketUrl);
-          const socketData = await socketResponse.json();
-          console.log("Socket Response:", socketData);
+          const socketResponse = await axios.get(socketUrl);
+          console.log("Socket Response:", socketResponse.data);
         } else {
           console.warn("VITE_APP_SOCKET_URL is not defined in your environment variables.");
         }
