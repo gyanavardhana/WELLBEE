@@ -34,7 +34,7 @@ axios.get(`${process.env.FASTAPI_URL}hello`, {
 });
 app.use(
     cors({
-        origin: '*',
+        origin: process.env.FRONTEND_URL,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],
     })

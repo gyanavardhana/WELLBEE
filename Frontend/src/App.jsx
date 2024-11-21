@@ -18,16 +18,7 @@ const App = () => {
   useEffect(() => {
     const fetchUrls = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_APP_URL;
         const socketUrl = import.meta.env.VITE_APP_SOCKET_URL;
-        console.log(apiUrl,socketUrl)
-        if (apiUrl) {
-          const apiResponse = await axios.get(apiUrl);
-          console.log("API Response:", apiResponse.data);
-        } else {
-          console.warn("VITE_APP_URL is not defined in your environment variables.");
-        }
-
         if (socketUrl) {
           const socketResponse = await axios.get(socketUrl);
           console.log("Socket Response:", socketResponse.data);
