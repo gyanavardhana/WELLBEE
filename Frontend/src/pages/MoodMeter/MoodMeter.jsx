@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { Music, Pause, Play, Loader2, RefreshCw, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import ReactEmojis from "@souhaildev/reactemojis";
+import Lottie from "lottie-react";
 import Navbar from "../../components/common/Navbar";
 
 const MoodMeter = () => {
@@ -12,19 +12,25 @@ const MoodMeter = () => {
   const [audio, setAudio] = useState(null);
   const [audioError, setAudioError] = useState(false);
   const [audioLoading, setAudioLoading] = useState(false);
+  const [lottieData, setLottieData] = useState(null);
 
-  // Cleanup audio on component unmount
+
+
   useEffect(() => {
-    return () => {
-      if (audio) {
-        audio.pause();
-        audio.removeEventListener("ended", handleAudioEnd);
-        audio.removeEventListener("error", handleAudioError);
-        audio.removeEventListener("canplaythrough", handleCanPlayThrough);
+    const fetchLottieData = async () => {
+      if (songData?.dominantSentiment) {
+        try {
+          const response = await fetch(getMoodEmoji(songData.dominantSentiment).lottieUrl);
+          const data = await response.json();
+          setLottieData(data);
+        } catch (error) {
+          console.error("Error loading Lottie animation:", error);
+        }
       }
     };
-  }, [audio]);
 
+    fetchLottieData();
+  }, [songData?.dominantSentiment]);
   const handleAudioEnd = () => {
     setIsPlaying(false);
     setAudioLoading(false);
@@ -96,7 +102,7 @@ const MoodMeter = () => {
 
     try {
       setAudioLoading(true);
-      
+
       if (isPlaying) {
         audio.pause();
         setIsPlaying(false);
@@ -152,19 +158,60 @@ const MoodMeter = () => {
     );
   };
 
-  // Rest of your getMoodEmoji function remains the same
   const getMoodEmoji = (sentiment) => {
     const moods = {
-      joy: { emoji: "😊", color: "#FFD700", size: "w-24 h-24 sm:w-48 sm:h-48" },
-      sadness: { emoji: "😢", color: "#87CEEB", size: "w-24 h-24 sm:w-48 sm:h-48" },
-      anger: { emoji: "😠", color: "#FF4500", size: "w-24 h-24 sm:w-48 sm:h-48" },
-      neutral: { emoji: "😐", color: "#E6E6FA", size: "w-24 h-24 sm:w-48 sm:h-48" },
-      surprise: { emoji: "🎉", color: "#FF69B4", size: "w-24 h-24 sm:w-48 sm:h-48" },
-      fear: { emoji: "😨", color: "#98FB98", size: "w-24 h-24 sm:w-48 sm:h-48" },
-      disgust: { emoji: "🤢", color: "#9370DB", size: "w-24 h-24 sm:w-48 sm:h-48" },
+      joy: {
+        lottieUrl:
+          "https://fonts.gstatic.com/s/e/notoemoji/latest/1f600/lottie.json",
+        color: "#FFD700",
+        size: "w-24 h-24 sm:w-48 sm:h-48",
+      },
+      sadness: {
+        lottieUrl:
+          "https://fonts.gstatic.com/s/e/notoemoji/latest/1f622/lottie.json",
+        color: "#87CEEB",
+        size: "w-24 h-24 sm:w-48 sm:h-48",
+      },
+      anger: {
+        lottieUrl:
+          "https://fonts.gstatic.com/s/e/notoemoji/latest/1f621/lottie.json",
+        color: "#FF4500",
+        size: "w-24 h-24 sm:w-48 sm:h-48",
+      },
+      neutral: {
+        lottieUrl:
+          "https://fonts.gstatic.com/s/e/notoemoji/latest/1f610/lottie.json",
+        color: "#E6E6FA",
+        size: "w-24 h-24 sm:w-48 sm:h-48",
+      },
+      surprise: {
+        lottieUrl:
+          "https://fonts.gstatic.com/s/e/notoemoji/latest/1f92f/lottie.json",
+        color: "#FF69B4",
+        size: "w-24 h-24 sm:w-48 sm:h-48",
+      },
+      fear: {
+        lottieUrl:
+          "https://fonts.gstatic.com/s/e/notoemoji/latest/1f628/lottie.json",
+        color: "#98FB98",
+        size: "w-24 h-24 sm:w-48 sm:h-48",
+      },
+      disgust: {
+        lottieUrl:
+          "https://fonts.gstatic.com/s/e/notoemoji/latest/1f922/lottie.json",
+        color: "#9370DB",
+        size: "w-24 h-24 sm:w-48 sm:h-48",
+      },
     };
 
-    return moods[sentiment?.toLowerCase()] || { emoji: "🎵", color: "#FFB6C1", size: "w-24 h-24 sm:w-48 sm:h-48" };
+    const defaultMood = {
+      lottieUrl:
+        "https://fonts.gstatic.com/s/e/notoemoji/latest/1f600/lottie.json",
+      color: "#FFB6C1",
+      size: "w-24 h-24 sm:w-48 sm:h-48",
+    };
+
+    return moods[sentiment?.toLowerCase()] || defaultMood;
   };
 
   return (
@@ -203,7 +250,6 @@ const MoodMeter = () => {
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            {/* Mood Section */}
             <AnimatePresence mode="wait">
               <motion.section
                 key="mood"
@@ -227,12 +273,14 @@ const MoodMeter = () => {
                     className="p-6 sm:p-8 rounded-xl text-center"
                   >
                     <div className="flex justify-center items-center mb-3 sm:mb-4">
-                      <div className={getMoodEmoji(songData?.dominantSentiment).size}>
-                        <ReactEmojis
-                          emoji={getMoodEmoji(songData?.dominantSentiment).emoji}
-                          emojiStyle="2"
-                          style={{ width: "100%", height: "100%" }}
-                        />
+                      <div className="w-24 h-24 sm:w-48 sm:h-48">
+                        {lottieData && (
+                          <Lottie
+                            animationData={lottieData}
+                            loop={true}
+                            autoplay={true}
+                          />
+                        )}
                       </div>
                     </div>
                     <motion.span
@@ -247,7 +295,7 @@ const MoodMeter = () => {
                 )}
               </motion.section>
 
-              {/* Song Section */}
+              {/* Song Section - remains exactly the same as in your original code */}
               <motion.section
                 key="song"
                 initial={{ opacity: 0, x: 20 }}
