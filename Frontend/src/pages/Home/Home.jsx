@@ -1,13 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/common/Navbar";
 import animation from "../../assets/images/logo.svg";
-import coachingImage from '../../assets/images/personalcoaching.svg';
-import chatImage from '../../assets/images/groupchat.svg';
-import moodMeterImage from '../../assets/images/moodmeter.svg';
-import therapyImage from '../../assets/images/therapy.svg';
+import coachingImage from "../../assets/images/personalcoaching.svg";
+import chatImage from "../../assets/images/groupchat.svg";
+import moodMeterImage from "../../assets/images/moodmeter.svg";
+import therapyImage from "../../assets/images/therapy.svg";
 import VultrChatbot from "../../components/common/VultrChatbot";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-orange-50 min-h-screen flex flex-col">
       <Navbar />
@@ -31,18 +34,18 @@ const Home = () => {
             Your holistic platform for physical and mental well-being.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <a
-              href="/signup"
+            <button
+              onClick={() => navigate("/signup")}
               className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition duration-300"
             >
               Sign Up
-            </a>
-            <a
-              href="/login"
+            </button>
+            <button
+              onClick={() => navigate("/login")}
               className="bg-orange-200 text-orange-800 px-6 py-2 rounded-lg hover:bg-orange-300 transition duration-300"
             >
               Log In
-            </a>
+            </button>
           </div>
         </div>
 
@@ -115,18 +118,18 @@ const Home = () => {
               Ready to start your wellness journey?
             </h3>
             <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-              <a
-                href="/signup"
+              <button
+                onClick={() => navigate("/signup")}
                 className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition duration-300"
               >
                 Sign Up
-              </a>
-              <a
-                href="/login"
+              </button>
+              <button
+                onClick={() => navigate("/login")}
                 className="bg-orange-100 text-orange-800 px-6 py-2 rounded-lg hover:bg-orange-300 transition duration-300"
               >
                 Log In
-              </a>
+              </button>
             </div>
           </div>
         </section>
@@ -136,28 +139,27 @@ const Home = () => {
           <div className="max-w-5xl mx-auto text-center">
             <p>© 2024 Wellbee. All Rights Reserved.</p>
             <div className="mt-4">
-              <a
-                href="/terms"
+              <button
+                onClick={() => navigate("/terms")}
                 className="text-orange-200 hover:text-white mx-2"
               >
                 Terms
-              </a>
-              <a
-                href="/privacy"
+              </button>
+              <button
+                onClick={() => navigate("/privacy")}
                 className="text-orange-200 hover:text-white mx-2"
               >
                 Privacy
-              </a>
-              <a
-                href="/contact"
+              </button>
+              <button
+                onClick={() => navigate("/contact")}
                 className="text-orange-200 hover:text-white mx-2"
               >
                 Contact
-              </a>
+              </button>
             </div>
           </div>
         </footer>
-        
       </div>
       <VultrChatbot />
     </div>

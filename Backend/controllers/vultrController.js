@@ -1,5 +1,6 @@
 const axios = require('axios');
 const logger = require('../logger/logger');
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
 const wellbeeContext = `
 # Wellbee: Health & Wellness Platform
 
@@ -85,46 +86,65 @@ Wellbee is a comprehensive health and wellness platform that supports both physi
     - Home → Therapy Portal → Browse Therapists → Schedule Session
 `;
 
+async function runChat(userInput) {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-exports.getVultrChatResponse = async (req, res) => {
-    const userInput = req.body.userInput;
+    const generationConfig = {
+        temperature: 0.8,
+        topK: 40,
+        topP: 0.9,
+        maxOutputTokens: 512,
+    };
 
-    try {
-        const enhancedPrompt = `
-            You are a helpful assistant for the Wellbee health and wellness platform. 
-            Use this context to inform your responses: ${wellbeeContext}
-            
-            User question: ${userInput}
-            
-            Please provide a helpful, relevant response based on Wellbee's features and capabilities.
-            If the question is not related to Wellbee or health/wellness, politely redirect the conversation 
-            to Wellbee's services.
-        `;
-        const response = await axios.post(
-            'https://api.vultrinference.com/v1/chat/completions',
+    const safetySettings = [
+        {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+    ];
+
+    const chat = model.startChat({
+        generationConfig,
+        safetySettings,
+        history: [
             {
-                model: 'llama2-13b-chat-Q5_K_M',
-                messages: [{ role: 'user', content: enhancedPrompt }],
-                max_tokens: 512,
-                seed: -1,
-                temperature: 0.8,
-                top_k: 40,
-                top_p: 0.9,
-                stream: false,
+                role: "user",
+                parts: [{ 
+                    text: `You are a helpful assistant for the Wellbee health and wellness platform. 
+                    Use this context to inform your responses: ${wellbeeContext}
+                    
+                    Please provide helpful, relevant responses based on Wellbee's features and capabilities.
+                    If questions are not related to Wellbee or health/wellness, politely redirect the conversation 
+                    to Wellbee's services.` 
+                }],
             },
             {
-                headers: {
-                    'Authorization': `Bearer ${process.env.VULTR_API_KEY}`,
-                    'Content-Type': 'application/json',
-                },
-            }
-        );
+                role: "model",
+                parts: [{ text: "I understand Wellbee's features and services. I'm here to help users with their health and wellness needs through the platform. How can I assist you today?" }],
+            },
+        ],
+    });
 
-        const botMessageContent = response.data.choices[0].message.content;
-        logger.info(`Vultr API response generated`);
-        res.json({ botMessage: botMessageContent });
-    } catch (error) {
-        logger.error(`An error occurred while fetching response from Vultr API: ${error.message}`);
-        res.status(500).json({ error: 'An error occurred while fetching response from Vultr API.' });
-    }
+    const result = await chat.sendMessage(userInput);
+    return result.response.text();
 }
+
+exports.getVultrChatResponse = async (req, res) => {
+    try {
+        const userInput = req.body?.userInput;
+        
+        if (!userInput) {
+            logger.error('Invalid request body for chat endpoint');
+            return res.status(400).json({ error: 'Invalid request body' });
+        }
+
+        const response = await runChat(userInput);
+        
+        logger.info('Gemini API response generated successfully');
+        res.json({ botMessage: response });
+    } catch (error) {
+        logger.error(`An error occurred while fetching response from Gemini API: ${error.message}`);
+        res.status(500).json({ error: 'An error occurred while fetching response from Gemini API.' });
+    }
+};
