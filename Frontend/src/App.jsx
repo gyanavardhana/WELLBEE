@@ -21,7 +21,10 @@ const App = () => {
         const socketUrl = import.meta.env.VITE_APP_SOCKET_URL;
         if (socketUrl) {
           const socketResponse = await axios.get(socketUrl);
+          const emotionResponse = await axios.get("https://fastapi-emotion.onrender.com/hello");
+          
           console.log("Socket Response:", socketResponse.data);
+          console.log("Emotion API Response:", emotionResponse.data);
         } else {
           console.warn("VITE_APP_SOCKET_URL is not defined in your environment variables.");
         }
